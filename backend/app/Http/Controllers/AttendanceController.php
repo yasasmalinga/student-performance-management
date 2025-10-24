@@ -158,19 +158,53 @@ class AttendanceController extends Controller
         ]);
     }
 
+    public function getAvailableMonths($studentId)
+    {
+        try {
+            $months = Attendance::where('studentId', $studentId)
+                ->selectRaw("DATE_FORMAT(attendanceDate, '%Y-%m') as month")
+                ->distinct()
+                ->orderBy('month', 'desc')
+                ->pluck('month')
+                ->map(function($month) {
+                    return [
+                        'value' => $month,
+                        'label' => date('F Y', strtotime($month . '-01'))
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'months' => $months
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get available months',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function statistics(Request $request, $studentId)
     {
-        $query = Attendance::where('studentId', $studentId);
+        $baseQuery = Attendance::where('studentId', $studentId);
 
         if ($request->has('subjectId')) {
-            $query->where('subjectId', $request->subjectId);
+            $baseQuery->where('subjectId', $request->subjectId);
         }
 
-        $total = $query->count();
-        $present = $query->where('status', 'Present')->count();
-        $absent = $query->where('status', 'Absent')->count();
-        $late = $query->where('status', 'Late')->count();
-        $excused = $query->where('status', 'Excused')->count();
+        // Add monthly filter
+        if ($request->has('month') && $request->month) {
+            $month = $request->month; // Format: YYYY-MM
+            $baseQuery->whereRaw("DATE_FORMAT(attendanceDate, '%Y-%m') = ?", [$month]);
+        }
+
+        $total = $baseQuery->count();
+        $present = (clone $baseQuery)->where('status', 'Present')->count();
+        $absent = (clone $baseQuery)->where('status', 'Absent')->count();
+        $late = (clone $baseQuery)->where('status', 'Late')->count();
+        $excused = (clone $baseQuery)->where('status', 'Excused')->count();
 
         $percentage = $total > 0 ? ($present / $total) * 100 : 0;
 
@@ -181,6 +215,7 @@ class AttendanceController extends Controller
             'late' => $late,
             'excused' => $excused,
             'percentage' => round($percentage, 2),
+            'month' => $request->month ?? null,
         ]);
     }
 }

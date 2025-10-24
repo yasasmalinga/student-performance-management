@@ -8,6 +8,9 @@ use App\Models\Admin;
 use App\Models\Teacher;
 use App\Models\Student;
 use App\Models\ParentModel;
+use App\Models\Attendance;
+use App\Models\Subject;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -16,7 +19,7 @@ class UserSeeder extends Seeder
         // Create Admin
         $admin = User::create([
             'userName' => 'admin',
-            'password' => 'admin123', // In production, use Hash::make('admin123')
+            'password' => Hash::make('admin123'),
             'userType' => User::TYPE_ADMIN,
             'userEmail' => 'admin@school.com',
             'userContact' => '1234567890',
@@ -30,7 +33,7 @@ class UserSeeder extends Seeder
         // Create Teachers
         $teacher1 = User::create([
             'userName' => 'john_teacher',
-            'password' => 'teacher123',
+            'password' => Hash::make('teacher123'),
             'userType' => User::TYPE_TEACHER,
             'userEmail' => 'john.teacher@school.com',
             'userContact' => '1234567891',
@@ -45,7 +48,7 @@ class UserSeeder extends Seeder
 
         $teacher2 = User::create([
             'userName' => 'sarah_teacher',
-            'password' => 'teacher123',
+            'password' => Hash::make('teacher123'),
             'userType' => User::TYPE_TEACHER,
             'userEmail' => 'sarah.teacher@school.com',
             'userContact' => '1234567892',
@@ -60,7 +63,7 @@ class UserSeeder extends Seeder
 
         $teacher3 = User::create([
             'userName' => 'mike_teacher',
-            'password' => 'teacher123',
+            'password' => Hash::make('teacher123'),
             'userType' => User::TYPE_TEACHER,
             'userEmail' => 'mike.teacher@school.com',
             'userContact' => '1234567893',
@@ -76,7 +79,7 @@ class UserSeeder extends Seeder
         // Create Parents
         $parent1 = User::create([
             'userName' => 'bob_parent',
-            'password' => 'parent123',
+            'password' => Hash::make('parent123'),
             'userType' => User::TYPE_PARENT,
             'userEmail' => 'bob.parent@school.com',
             'userContact' => '1234567894',
@@ -89,7 +92,7 @@ class UserSeeder extends Seeder
 
         $parent2 = User::create([
             'userName' => 'alice_parent',
-            'password' => 'parent123',
+            'password' => Hash::make('parent123'),
             'userType' => User::TYPE_PARENT,
             'userEmail' => 'alice.parent@school.com',
             'userContact' => '1234567895',
@@ -103,7 +106,7 @@ class UserSeeder extends Seeder
         // Create Students
         $student1 = User::create([
             'userName' => 'jane_student',
-            'password' => 'student123',
+            'password' => Hash::make('student123'),
             'userType' => User::TYPE_STUDENT,
             'userEmail' => 'jane.student@school.com',
             'userContact' => '1234567896',
@@ -119,7 +122,7 @@ class UserSeeder extends Seeder
 
         $student2 = User::create([
             'userName' => 'tom_student',
-            'password' => 'student123',
+            'password' => Hash::make('student123'),
             'userType' => User::TYPE_STUDENT,
             'userEmail' => 'tom.student@school.com',
             'userContact' => '1234567897',
@@ -135,7 +138,7 @@ class UserSeeder extends Seeder
 
         $student3 = User::create([
             'userName' => 'emma_student',
-            'password' => 'student123',
+            'password' => Hash::make('student123'),
             'userType' => User::TYPE_STUDENT,
             'userEmail' => 'emma.student@school.com',
             'userContact' => '1234567898',
@@ -151,7 +154,7 @@ class UserSeeder extends Seeder
 
         $student4 = User::create([
             'userName' => 'oliver_student',
-            'password' => 'student123',
+            'password' => Hash::make('student123'),
             'userType' => User::TYPE_STUDENT,
             'userEmail' => 'oliver.student@school.com',
             'userContact' => '1234567899',
@@ -167,7 +170,7 @@ class UserSeeder extends Seeder
 
         $student5 = User::create([
             'userName' => 'sophia_student',
-            'password' => 'student123',
+            'password' => Hash::make('student123'),
             'userType' => User::TYPE_STUDENT,
             'userEmail' => 'sophia.student@school.com',
             'userContact' => '1234567800',
@@ -181,9 +184,48 @@ class UserSeeder extends Seeder
             'enrollmentDate' => '2023-09-01',
         ]);
 
-        // Update parent records with student IDs
-        $parentRecord1->update(['studentId' => $studentRecord1->studentId]);
-        $parentRecord2->update(['studentId' => $studentRecord2->studentId]);
+        // Note: We don't update parent records with studentId anymore
+        // Instead, we'll query students by parentId to get all children
+        // This allows parents to have multiple children
+        
+        // Create sample attendance data
+        $this->createSampleAttendanceData($studentRecord1, $studentRecord2, $studentRecord3, $studentRecord4, $studentRecord5);
+    }
+    
+    private function createSampleAttendanceData($student1, $student2, $student3, $student4, $student5) {
+        // Get some subjects for attendance
+        $subjects = Subject::take(3)->get();
+        if ($subjects->isEmpty()) {
+            // Create some basic subjects if none exist
+            $subjects = collect([
+                Subject::create(['subjectName' => 'Mathematics', 'subjectType' => 1, 'description' => 'Core Math']),
+                Subject::create(['subjectName' => 'Science', 'subjectType' => 1, 'description' => 'Core Science']),
+                Subject::create(['subjectName' => 'English', 'subjectType' => 1, 'description' => 'Core English'])
+            ]);
+        }
+        
+        $students = [$student1, $student2, $student3, $student4, $student5];
+        $statuses = ['Present', 'Present', 'Present', 'Absent', 'Late']; // Mostly present
+        
+        // Create 30 days of attendance data for each student
+        for ($day = 1; $day <= 30; $day++) {
+            $date = date('Y-m-d', strtotime("2024-01-01 +{$day} days"));
+            
+            foreach ($students as $student) {
+                foreach ($subjects as $subject) {
+                    $status = $statuses[array_rand($statuses)];
+                    
+                    Attendance::create([
+                        'studentId' => $student->studentId,
+                        'subjectId' => $subject->subjectId,
+                        'teacherId' => 1, // Use first teacher
+                        'attendanceDate' => $date,
+                        'status' => $status,
+                        'remarks' => $status === 'Absent' ? 'Sick' : ($status === 'Late' ? 'Traffic' : null)
+                    ]);
+                }
+            }
+        }
     }
 }
 

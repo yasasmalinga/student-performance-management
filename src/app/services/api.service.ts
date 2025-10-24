@@ -134,6 +134,10 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/parents/${id}`, { headers: this.getHeaders() });
   }
 
+  getParentByUserId(userId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/parents/by-user/${userId}`, { headers: this.getHeaders() });
+  }
+
   createParent(parentData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/parents`, parentData, { headers: this.getHeaders() });
   }
@@ -159,8 +163,16 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/students/${studentId}/test-results`, { headers: this.getHeaders() });
   }
 
-  getStudentAttendance(studentId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/attendance/statistics/${studentId}`, { headers: this.getHeaders() });
+  getStudentAttendance(studentId: number, month?: string): Observable<any> {
+    let url = `${this.apiUrl}/attendance/statistics/${studentId}`;
+    if (month) {
+      url += `?month=${month}`;
+    }
+    return this.http.get(url, { headers: this.getHeaders() });
+  }
+
+  getAvailableMonths(studentId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/attendance/months/${studentId}`, { headers: this.getHeaders() });
   }
 
   // Teachers endpoints

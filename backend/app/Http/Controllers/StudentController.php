@@ -214,15 +214,15 @@ class StudentController extends Controller
 
         $subjectPerformance = $testResults->groupBy('test.subjectId')->map(function($results) {
             return [
-                'subject' => $results->first()->test->subject->subjectName,
-                'averageMarks' => $results->avg('marksObtained'),
-                'totalTests' => $results->count(),
+                'subjectName' => $results->first()->test->subject->subjectName,
+                'average' => round($results->avg('marksObtained'), 2),
+                'testCount' => $results->count(),
             ];
         })->values();
 
         return response()->json([
             'student' => $student->load('user'),
-            'averageMarks' => round($averageMarks, 2),
+            'average' => round($averageMarks, 2),
             'totalTests' => $totalTests,
             'subjectPerformance' => $subjectPerformance,
             'recentResults' => $testResults->take(10),
@@ -277,6 +277,39 @@ class StudentController extends Controller
         $result->delete();
 
         return response()->json(['message' => 'Test result deleted successfully']);
+    }
+
+    public function getTestResults($id)
+    {
+        try {
+            $student = Student::findOrFail($id);
+            
+            $testResults = StudentTestResult::where('studentId', $id)
+                ->with(['test.subject'])
+                ->get()
+                ->map(function($result) {
+                    return [
+                        'resultId' => $result->resultId,
+                        'studentId' => $result->studentId,
+                        'testId' => $result->testId,
+                        'marks' => $result->marksObtained,
+                        'totalMarks' => $result->test->testMark,
+                        'grade' => $result->grade,
+                        'remarks' => $result->remarks,
+                        'testName' => $result->test->subject->subjectName . ' Test',
+                        'testDate' => $result->test->testDate,
+                        'subjectName' => $result->test->subject->subjectName,
+                        'testType' => $result->test->testType
+                    ];
+                });
+            
+            return response()->json($testResults);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to get student test results',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function report($id)

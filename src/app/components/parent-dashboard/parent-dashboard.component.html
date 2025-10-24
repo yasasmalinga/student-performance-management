@@ -1,0 +1,259 @@
+<div class="parent-dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <h1>👨‍👩‍👧‍👦 Parent Portal</h1>
+        <p>Welcome, {{ parentName }}</p>
+      </div>
+      <div class="user-actions">
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="dashboard-nav">
+    <button 
+      class="nav-btn" 
+      [class.active]="activeView === 'dashboard'"
+      (click)="setActiveView('dashboard')"
+    >
+      📊 Dashboard
+    </button>
+    <button 
+      class="nav-btn" 
+      [class.active]="activeView === 'performance'"
+      (click)="setActiveView('performance')"
+    >
+      📈 Performance
+    </button>
+    <button 
+      class="nav-btn" 
+      [class.active]="activeView === 'attendance'"
+      (click)="setActiveView('attendance')"
+    >
+      📅 Attendance
+    </button>
+    <button 
+      class="nav-btn" 
+      [class.active]="activeView === 'tests'"
+      (click)="setActiveView('tests')"
+    >
+      📝 Tests & Results
+    </button>
+    <button 
+      class="nav-btn" 
+      [class.active]="activeView === 'notifications'"
+      (click)="setActiveView('notifications')"
+    >
+      🔔 Notifications
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your child's information...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage" class="error-state">
+      <p>❌ {{ errorMessage }}</p>
+    </div>
+
+    <!-- Dashboard View -->
+    <div *ngIf="activeView === 'dashboard' && !isLoading && !errorMessage" class="dashboard-view">
+      <div class="welcome-section">
+        <h2>👋 Welcome to Your Parent Portal</h2>
+        <p>Welcome, {{ parentName }}</p>
+        
+        <!-- Student Selector -->
+        <div *ngIf="students.length > 1" class="student-selector">
+          <label for="studentSelect">Select Child:</label>
+          <select id="studentSelect" (change)="selectStudent($any($event.target).value)" class="student-dropdown">
+            <option *ngFor="let student of students" [value]="student.studentId" [selected]="selectedStudent?.studentId === student.studentId">
+              {{ student.user?.userName || student.studentNumber }} ({{ student.studentNumber }})
+            </option>
+          </select>
+        </div>
+        
+        <p *ngIf="selectedStudent">You're viewing information for <strong>{{ selectedStudent.user?.userName || selectedStudent.studentNumber }}</strong></p>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <h3>{{ studentOverallAverage.toFixed(1) }}%</h3>
+            <p>Overall Average</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <h3>{{ studentAttendanceRate.toFixed(1) }}%</h3>
+            <p>Attendance Rate</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">📝</div>
+          <div class="stat-content">
+            <h3>{{ completedTests }}/{{ totalTests }}</h3>
+            <p>Tests Completed</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-content">
+            <h3>{{ gradeDistribution['A'] + gradeDistribution['B'] }}</h3>
+            <p>Good Grades (A & B)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-activity">
+        <h3>📈 Recent Performance</h3>
+        <div *ngIf="subjectPerformance && subjectPerformance.length > 0" class="subject-performance">
+          <div *ngFor="let subject of subjectPerformance.slice(0, 5)" class="subject-item">
+            <span class="subject-name">{{ subject.subjectName }}</span>
+            <span class="subject-average">{{ subject.average?.toFixed(1) || 'N/A' }}%</span>
+          </div>
+        </div>
+        <div *ngIf="!subjectPerformance || subjectPerformance.length === 0" class="no-data">
+          <p>No performance data available yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance View -->
+    <div *ngIf="activeView === 'performance' && !isLoading" class="performance-view">
+      <h2>📈 Academic Performance</h2>
+      
+      <div *ngIf="subjectPerformance && subjectPerformance.length > 0" class="performance-grid">
+        <div *ngFor="let subject of subjectPerformance" class="performance-card">
+          <h3>{{ subject.subjectName }}</h3>
+          <div class="performance-metrics">
+            <div class="metric">
+              <span class="metric-label">Average:</span>
+              <span class="metric-value">{{ subject.average?.toFixed(1) || 'N/A' }}%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Tests:</span>
+              <span class="metric-value">{{ subject.testCount || 0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="!subjectPerformance || subjectPerformance.length === 0" class="no-data">
+        <p>📊 No performance data available yet.</p>
+      </div>
+    </div>
+
+    <!-- Attendance View -->
+    <div *ngIf="activeView === 'attendance' && !isLoading" class="attendance-view">
+      <div class="attendance-header">
+        <h2>📅 Attendance Overview</h2>
+        
+        <!-- Monthly Filter -->
+        <div class="month-filter">
+          <label for="monthSelect">Filter by Month:</label>
+          <select id="monthSelect" (change)="onMonthChange($any($event.target).value)" class="month-dropdown">
+            <option value="">All Time</option>
+            <option *ngFor="let month of availableMonths" [value]="month.value" [selected]="selectedMonth === month.value">
+              {{ month.label }}
+            </option>
+          </select>
+          <button *ngIf="isMonthlyView" (click)="clearMonthFilter()" class="clear-filter-btn">
+            Clear Filter
+          </button>
+        </div>
+      </div>
+      
+      <div class="attendance-summary">
+        <div class="attendance-card present">
+          <h3>{{ presentCount }}</h3>
+          <p>Present Days</p>
+        </div>
+        <div class="attendance-card absent">
+          <h3>{{ absentCount }}</h3>
+          <p>Absent Days</p>
+        </div>
+        <div class="attendance-card late">
+          <h3>{{ lateCount }}</h3>
+          <p>Late Days</p>
+        </div>
+        <div class="attendance-card total">
+          <h3>{{ totalAttendance }}</h3>
+          <p>Total Days</p>
+        </div>
+      </div>
+      
+      <div class="attendance-rate">
+        <h3>Overall Attendance Rate: {{ studentAttendanceRate.toFixed(1) }}%</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="studentAttendanceRate"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tests View -->
+    <div *ngIf="activeView === 'tests' && !isLoading" class="tests-view">
+      <h2>📝 Tests & Results</h2>
+      
+      <div *ngIf="studentTestResults && studentTestResults.length > 0" class="test-results">
+        <div *ngFor="let test of studentTestResults" class="test-card">
+          <div class="test-header">
+            <h3>{{ test.testName }}</h3>
+            <span class="test-date">{{ test.testDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="test-details">
+            <div class="test-metric">
+              <span class="metric-label">Subject:</span>
+              <span class="metric-value">{{ test.subjectName }}</span>
+            </div>
+            <div class="test-metric">
+              <span class="metric-label">Marks:</span>
+              <span class="metric-value">{{ test.marks || 'N/A' }}/{{ test.totalMarks || 'N/A' }}</span>
+            </div>
+            <div class="test-metric">
+              <span class="metric-label">Grade:</span>
+              <span class="metric-value grade" [style.color]="getGradeColor(test.grade)">{{ test.grade || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="!studentTestResults || studentTestResults.length === 0" class="no-data">
+        <p>📝 No test results available yet.</p>
+      </div>
+    </div>
+
+    <!-- Notifications View -->
+    <div *ngIf="activeView === 'notifications' && !isLoading" class="notifications-view">
+      <h2>🔔 Notifications</h2>
+      
+      <div *ngIf="notifications && notifications.length > 0" class="notifications-list">
+        <div *ngFor="let notification of notifications" class="notification-card">
+          <div class="notification-header">
+            <h3>{{ notification.title }}</h3>
+            <span class="notification-date">{{ notification.createdAt | date:'medium' }}</span>
+          </div>
+          <p>{{ notification.message }}</p>
+        </div>
+      </div>
+      
+      <div *ngIf="!notifications || notifications.length === 0" class="no-data">
+        <p>🔔 No notifications at this time.</p>
+      </div>
+    </div>
+  </main>
+</div>

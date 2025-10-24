@@ -33,6 +33,7 @@ Route::get('/students/without-parents', [ParentController::class, 'getStudents']
 Route::get('/students/{id}', [StudentController::class, 'show']); // Get student details
 Route::get('/students/{id}/performance', [StudentController::class, 'performance']); // Get student performance
 Route::get('/students/{id}/report', [StudentController::class, 'report']); // Get student report
+Route::get('/students/{id}/test-results', [StudentController::class, 'getTestResults']); // Get student test results
 Route::put('/students/{id}', [StudentController::class, 'update']); // Update student
 Route::put('/students/{id}/parent', [StudentController::class, 'updateParent']); // Update student's parent
 Route::get('/subjects', [SubjectController::class, 'index']);
@@ -43,10 +44,12 @@ Route::delete('/subjects/{id}', [SubjectController::class, 'destroy']); // Delet
 Route::get('/parents', [ParentController::class, 'index']); // Get all parents
 Route::post('/parents', [ParentController::class, 'store']); // Create parent
 Route::get('/parents/{id}', [ParentController::class, 'show']); // Get parent details
+Route::get('/parents/by-user/{userId}', [ParentController::class, 'getByUserId']); // Get parent by user ID
 Route::put('/parents/{id}', [ParentController::class, 'update']); // Update parent
 Route::post('/parents/{id}/assign-student', [ParentController::class, 'linkToStudent']); // Assign student to parent
 Route::get('/attendance', [AttendanceController::class, 'index']); // Get all attendance records (for testing)
 Route::get('/attendance/statistics/{studentId}', [AttendanceController::class, 'statistics']); // Get attendance statistics
+Route::get('/attendance/months/{studentId}', [AttendanceController::class, 'getAvailableMonths']); // Get available months for student
 Route::post('/attendance/bulk', [AttendanceController::class, 'bulkStore']); // Bulk save attendance
 Route::get('/attendance/by-date/{date}', [AttendanceController::class, 'getByDate']); // Get attendance by date
 Route::get('/tests', [TestController::class, 'index']); // Get all tests
@@ -110,7 +113,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('check.usertype:1,2'); // Admin and Teacher
     Route::delete('/attendance/{id}', [AttendanceController::class, 'destroy'])
         ->middleware('check.usertype:1,2'); // Admin and Teacher
-    Route::get('/attendance/statistics/{studentId}', [AttendanceController::class, 'statistics']);
 
     // Students (index, show, performance, and report moved to public routes for testing)
     // Route::get('/students', [StudentController::class, 'index']);

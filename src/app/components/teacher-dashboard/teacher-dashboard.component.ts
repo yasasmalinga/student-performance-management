@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -549,7 +550,14 @@ export class TeacherDashboardComponent implements OnInit {
       return;
     }
 
-    const reportHtml = this.createSubjectPerformanceReportHtml(subject);
+    // Apply grade filter if selected
+    let filteredStudents = this.allStudentGrades;
+    if (this.selectedGradeForReport) {
+      filteredStudents = this.allStudentGrades.filter(s => s.gradeId == this.selectedGradeForReport);
+      console.log(`📊 Filtering Subject Report by grade ${this.selectedGradeForReport}: ${filteredStudents.length} students`);
+    }
+
+    const reportHtml = this.createSubjectPerformanceReportHtml(subject, filteredStudents);
     this.openReportInNewWindow(reportHtml);
   }
 
@@ -596,7 +604,20 @@ export class TeacherDashboardComponent implements OnInit {
   generateClassSummaryReport() {
     if (!isPlatformBrowser(this.platformId)) return;
     
-    const reportHtml = this.createClassSummaryReportHtml();
+    if (this.allStudentGrades.length === 0) {
+      alert('Please wait, loading student data...');
+      this.loadGrades();
+      return;
+    }
+
+    // Apply grade filter if selected
+    let filteredStudents = this.allStudentGrades;
+    if (this.selectedGradeForReport) {
+      filteredStudents = this.allStudentGrades.filter(s => s.gradeId == this.selectedGradeForReport);
+      console.log(`📊 Filtering Class Summary Report by grade ${this.selectedGradeForReport}: ${filteredStudents.length} students`);
+    }
+
+    const reportHtml = this.createClassSummaryReportHtml(filteredStudents);
     this.openReportInNewWindow(reportHtml);
   }
 
@@ -692,9 +713,9 @@ export class TeacherDashboardComponent implements OnInit {
     `);
   }
 
-  createSubjectPerformanceReportHtml(subject: any): string {
-    const studentsInSubject = this.allStudentGrades.filter(s => 
-      s.subjectPerformance.some((sp: any) => sp.subject === subject.name)
+  createSubjectPerformanceReportHtml(subject: any, studentsData?: any[]): string {
+    const studentsInSubject = (studentsData || this.allStudentGrades).filter(s => 
+      s.subjectPerformance.some((sp: any) => sp.subjectName === subject.name)
     );
 
     if (studentsInSubject.length === 0) {
@@ -709,31 +730,31 @@ export class TeacherDashboardComponent implements OnInit {
     }
 
     const totalTests = studentsInSubject.reduce((sum, s) => {
-      const subjectData = s.subjectPerformance.find((sp: any) => sp.subject === subject.name);
-      return sum + (subjectData?.totalTests || 0);
+      const subjectData = s.subjectPerformance.find((sp: any) => sp.subjectName === subject.name);
+      return sum + (subjectData?.testCount || 0);
     }, 0);
 
     const avgMarks = studentsInSubject.reduce((sum, s) => {
-      const subjectData = s.subjectPerformance.find((sp: any) => sp.subject === subject.name);
-      return sum + (subjectData?.averageMarks || 0);
+      const subjectData = s.subjectPerformance.find((sp: any) => sp.subjectName === subject.name);
+      return sum + (subjectData?.average || 0);
     }, 0) / studentsInSubject.length;
 
     const rows = studentsInSubject
       .sort((a, b) => {
-        const aData = a.subjectPerformance.find((sp: any) => sp.subject === subject.name);
-        const bData = b.subjectPerformance.find((sp: any) => sp.subject === subject.name);
-        return (bData?.averageMarks || 0) - (aData?.averageMarks || 0);
+        const aData = a.subjectPerformance.find((sp: any) => sp.subjectName === subject.name);
+        const bData = b.subjectPerformance.find((sp: any) => sp.subjectName === subject.name);
+        return (bData?.average || 0) - (aData?.average || 0);
       })
       .map((s, index) => {
-        const subjectData = s.subjectPerformance.find((sp: any) => sp.subject === subject.name);
-        const marks = subjectData?.averageMarks || 0;
+        const subjectData = s.subjectPerformance.find((sp: any) => sp.subjectName === subject.name);
+        const marks = subjectData?.average || 0;
         const grade = this.calculateGrade(marks);
         return `
           <tr>
             <td>${index + 1}</td>
             <td>${s.studentNumber}</td>
             <td>${s.name}</td>
-            <td>${subjectData?.totalTests || 0}</td>
+            <td>${subjectData?.testCount || 0}</td>
             <td><span class="marks-badge">${marks.toFixed(1)}%</span></td>
             <td><span class="grade-badge-${grade.replace('+', 'plus')}">${grade}</span></td>
           </tr>
@@ -838,16 +859,22 @@ export class TeacherDashboardComponent implements OnInit {
     `);
   }
 
-  createClassSummaryReportHtml(): string {
-    const avgMarks = this.allStudentGrades.reduce((sum, s) => sum + s.averageMarks, 0) / this.allStudentGrades.length || 0;
-    const highPerformers = this.allStudentGrades.filter(s => s.averageMarks >= 85).length;
-    const mediumPerformers = this.allStudentGrades.filter(s => s.averageMarks >= 70 && s.averageMarks < 85).length;
-    const lowPerformers = this.allStudentGrades.filter(s => s.averageMarks < 70).length;
+  createClassSummaryReportHtml(studentsData?: any[]): string {
+    const studentsToAnalyze = studentsData || this.allStudentGrades;
+    const avgMarks = studentsToAnalyze.reduce((sum, s) => sum + s.averageMarks, 0) / studentsToAnalyze.length || 0;
+    const highPerformers = studentsToAnalyze.filter(s => s.averageMarks >= 85).length;
+    const mediumPerformers = studentsToAnalyze.filter(s => s.averageMarks >= 70 && s.averageMarks < 85).length;
+    const lowPerformers = studentsToAnalyze.filter(s => s.averageMarks < 70).length;
 
-    return this.createReportTemplate('Class Summary Report', `
+    // Get grade name for the report title
+    const gradeName = this.selectedGradeForReport ? this.getGradeName(this.selectedGradeForReport) : 'All Grades';
+    const reportTitle = gradeName === 'All Grades' ? 'Class Summary Report' : `${gradeName} - Class Summary Report`;
+
+    return this.createReportTemplate(reportTitle, `
       <div class="summary-box">
         <h3>Overall Class Statistics</h3>
-        <p><strong>Total Students:</strong> ${this.students.length}</p>
+        <p><strong>Grade:</strong> ${gradeName}</p>
+        <p><strong>Total Students:</strong> ${studentsToAnalyze.length}</p>
         <p><strong>Total Subjects:</strong> ${this.subjects.length}</p>
         <p><strong>Total Tests:</strong> ${this.tests.length}</p>
         <p><strong>Class Average:</strong> ${avgMarks.toFixed(1)}%</p>
@@ -855,14 +882,29 @@ export class TeacherDashboardComponent implements OnInit {
 
       <div class="summary-box">
         <h3>Performance Distribution</h3>
-        <p><strong>High Performers (≥85%):</strong> ${highPerformers} students (${((highPerformers/this.allStudentGrades.length)*100).toFixed(1)}%)</p>
-        <p><strong>Medium Performers (70-84%):</strong> ${mediumPerformers} students (${((mediumPerformers/this.allStudentGrades.length)*100).toFixed(1)}%)</p>
-        <p><strong>Need Attention (<70%):</strong> ${lowPerformers} students (${((lowPerformers/this.allStudentGrades.length)*100).toFixed(1)}%)</p>
+        <p><strong>High Performers (≥85%):</strong> ${highPerformers} students (${studentsToAnalyze.length > 0 ? ((highPerformers/studentsToAnalyze.length)*100).toFixed(1) : 0}%)</p>
+        <p><strong>Medium Performers (70-84%):</strong> ${mediumPerformers} students (${studentsToAnalyze.length > 0 ? ((mediumPerformers/studentsToAnalyze.length)*100).toFixed(1) : 0}%)</p>
+        <p><strong>Need Attention (<70%):</strong> ${lowPerformers} students (${studentsToAnalyze.length > 0 ? ((lowPerformers/studentsToAnalyze.length)*100).toFixed(1) : 0}%)</p>
       </div>
 
       <div class="summary-box">
         <h3>Subject-wise Summary</h3>
-        ${this.subjects.map(subj => `<p><strong>${subj.name}:</strong> ${subj.studentsCount || 0} students enrolled</p>`).join('')}
+        ${this.subjects.map(subj => {
+          const studentsInSubject = studentsToAnalyze.filter(s => 
+            s.subjectPerformance.some((sp: any) => sp.subjectName === subj.name)
+          ).length;
+          const avgInSubject = studentsToAnalyze
+            .filter(s => s.subjectPerformance.some((sp: any) => sp.subjectName === subj.name))
+            .reduce((sum, s) => {
+              const subjectData = s.subjectPerformance.find((sp: any) => sp.subjectName === subj.name);
+              return sum + (subjectData?.average || 0);
+            }, 0);
+          const studentCount = studentsToAnalyze.filter(s => 
+            s.subjectPerformance.some((sp: any) => sp.subjectName === subj.name)
+          ).length;
+          const subjectAvg = studentCount > 0 ? (avgInSubject / studentCount).toFixed(1) : 'N/A';
+          return `<p><strong>${subj.name}:</strong> ${studentsInSubject} students enrolled, Average: ${subjectAvg}%</p>`;
+        }).join('')}
       </div>
     `);
   }
@@ -951,7 +993,9 @@ export class TeacherDashboardComponent implements OnInit {
 
   async calculateStudentGrade(student: any): Promise<any> {
     try {
-      const performance = await this.apiService.getStudentPerformance(student.studentId).toPromise();
+      const performance = await this.apiService.getStudentPerformance(student.studentId).pipe(
+        take(1)
+      ).toPromise();
       
       return {
         id: student.studentId,
@@ -961,8 +1005,8 @@ export class TeacherDashboardComponent implements OnInit {
         grade: student.grade_level?.gradeName || student.grade || 'N/A',
         section: student.section || 'N/A',
         totalTests: performance?.totalTests || 0,
-        averageMarks: performance?.averageMarks || 0,
-        overallGrade: this.calculateGrade(performance?.averageMarks || 0),
+        averageMarks: performance?.average || 0,
+        overallGrade: this.calculateGrade(performance?.average || 0),
         subjectPerformance: performance?.subjectPerformance || []
       };
     } catch (error) {
@@ -1016,7 +1060,7 @@ export class TeacherDashboardComponent implements OnInit {
   viewStudentGrades(student: any) {
     // Show detailed breakdown by subject
     const subjectsBreakdown = student.subjectPerformance.map((sp: any) => 
-      `${sp.subject}: ${sp.averageMarks}% (${sp.totalTests} tests)`
+      `${sp.subjectName}: ${sp.average}% (${sp.testCount} tests)`
     ).join('\n');
 
     alert(`📊 Detailed Grades for ${student.name}\n\nOverall Average: ${student.averageMarks.toFixed(1)}%\nOverall Grade: ${student.overallGrade}\nTotal Tests: ${student.totalTests}\n\nSubject-wise Performance:\n${subjectsBreakdown || 'No subject data available'}`);

@@ -28,6 +28,57 @@ class ParentController extends Controller
         return response()->json($parents);
     }
 
+    public function show($id)
+    {
+        try {
+            $parent = ParentModel::with('user', 'student.user')->findOrFail($id);
+            
+            return response()->json([
+                'success' => true,
+                'parent' => $parent
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Parent not found',
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
+
+    public function getByUserId($userId)
+    {
+        try {
+            $parent = ParentModel::with('user')
+                ->where('userId', $userId)
+                ->first();
+            
+            if (!$parent) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Parent not found for this user'
+                ], 404);
+            }
+            
+            // Get all students for this parent
+            $students = Student::with('user')
+                ->where('parentId', $userId)
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'parent' => $parent,
+                'students' => $students
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get parent details',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
