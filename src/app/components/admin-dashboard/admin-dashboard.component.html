@@ -1,0 +1,672 @@
+<div class="dashboard-container">
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>MAIN NAVIGATION</h3>
+      <div class="logo-placeholder">LOGO</div>
+      <button class="menu-toggle">☰</button>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a class="nav-item" [class.active]="activeView === 'dashboard'" (click)="switchView('dashboard')">
+        <span class="nav-icon">📊</span>
+        Dashboard
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'administration'" (click)="switchView('administration')">
+        <span class="nav-icon">⚙️</span>
+        Administration
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'authentication'" (click)="switchView('authentication')">
+        <span class="nav-icon">🔐</span>
+        Authentication
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'students'" (click)="switchView('students')">
+        <span class="nav-icon">👨‍🎓</span>
+        Students
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'teachers'" (click)="switchView('teachers')">
+        <span class="nav-icon">👨‍🏫</span>
+        Teachers
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'guardians'" (click)="switchView('guardians')">
+        <span class="nav-icon">👨‍👩‍👧‍👦</span>
+        Guardians
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'subjects'" (click)="switchView('subjects')">
+        <span class="nav-icon">📚</span>
+        Subjects
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'extra-activity'" (click)="switchView('extra-activity')">
+        <span class="nav-icon">🏃‍♂️</span>
+        Extra Activity
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'aptitude'" (click)="switchView('aptitude')">
+        <span class="nav-icon">⭐</span>
+        Aptitude Test
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'career'" (click)="switchView('career')">
+        <span class="nav-icon">📈</span>
+        Career Monitoring
+      </a>
+      <a class="nav-item" [class.active]="activeView === 'reporting'" (click)="switchView('reporting')">
+        <span class="nav-icon">📋</span>
+        Reporting
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <span class="header-icon">📊</span>
+        <h1>DashBoard</h1>
+      </div>
+      <div class="header-right">
+        <span class="user-info">{{ adminName }}</span>
+        <div class="user-avatar">{{ adminName.charAt(0).toUpperCase() }}</div>
+        <button class="logout-btn" (click)="logout()">🚪 Logout</button>
+      </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div *ngIf="activeView === 'dashboard'">
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card students-attendance">
+        <div class="card-content">
+          <h3>Students Attendance AVG</h3>
+          <div class="card-stats">
+            <span class="stat-label">Average Attendance</span>
+            <span class="stat-value">{{ studentsAttendanceAvg.toFixed(1) }}%</span>
+            <span class="stat-icon">📅</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card student-progress">
+        <div class="card-content">
+          <h3>Student Progress AVG</h3>
+          <div class="card-stats">
+            <span class="stat-label">Average Performance</span>
+            <span class="stat-value">{{ studentsProgressAvg.toFixed(1) }}%</span>
+            <span class="stat-icon">📈</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card student-breakdown">
+        <div class="card-content">
+          <h3>Total Records</h3>
+          <div class="card-stats">
+            <span class="stat-label">Attendance Records</span>
+            <span class="stat-value">{{ totalAttendanceRecords }}</span>
+            <span class="stat-icon">📊</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards Grid -->
+    <div class="dashboard-grid">
+      <div class="dashboard-card institute-log">
+        <div class="card-icon">🏢</div>
+        <div class="card-text">Institute Log</div>
+        <div class="card-count">5</div>
+      </div>
+      
+      <div class="dashboard-card student-info">
+        <div class="card-icon">👤</div>
+        <div class="card-text">Student Info</div>
+        <div class="card-count">{{ totalStudents }}</div>
+      </div>
+      
+      <div class="dashboard-card attendance">
+        <div class="card-icon">📅</div>
+        <div class="card-text">Attendance Records</div>
+        <div class="card-count">{{ totalAttendanceRecords }}</div>
+      </div>
+      
+      <div class="dashboard-card teachers-info">
+        <div class="card-icon">👨‍🏫</div>
+        <div class="card-text">Teachers Info</div>
+        <div class="card-count">{{ totalTeachers }}</div>
+      </div>
+      
+      <div class="dashboard-card subjects">
+        <div class="card-icon">📚</div>
+        <div class="card-text">Subjects</div>
+        <div class="card-count">{{ totalSubjects }}</div>
+      </div>
+      
+      <div class="dashboard-card extra-activity">
+        <div class="card-icon">🏃‍♂️</div>
+        <div class="card-text">Extra Activity</div>
+      </div>
+      
+      <div class="dashboard-card aptitudes">
+        <div class="card-icon">⭐</div>
+        <div class="card-text">Aptitudes</div>
+      </div>
+      
+      <div class="dashboard-card career-monitoring">
+        <div class="card-icon">📈</div>
+        <div class="card-text">Career Monitoring</div>
+      </div>
+      
+      <div class="dashboard-card reporting">
+        <div class="card-icon">📋</div>
+        <div class="card-text">Reporting</div>
+      </div>
+      
+      <div class="dashboard-card progress">
+        <div class="card-icon">📊</div>
+        <div class="card-text">Progress</div>
+      </div>
+      
+      <div class="dashboard-card information">
+        <div class="card-icon">ℹ️</div>
+        <div class="card-text">Information</div>
+      </div>
+      
+      <div class="dashboard-card register">
+        <div class="card-icon">📝</div>
+        <div class="card-text">Register</div>
+      </div>
+      
+      <div class="dashboard-card monitoring">
+        <div class="card-icon">🔍</div>
+        <div class="card-text">Monitoring</div>
+      </div>
+      
+      <div class="dashboard-card contacts">
+        <div class="card-icon">📞</div>
+        <div class="card-text">Contacts</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Students View -->
+    <div *ngIf="activeView === 'students'" class="content-view">
+      <h2>👨‍🎓 Students Management</h2>
+      <p class="view-subtitle">Total Students: <strong>{{ totalStudents }}</strong></p>
+      
+      <div *ngIf="studentsList.length === 0" class="empty-state">
+        <p>📭 No students found in the database.</p>
+        <p>Students will appear here once they are added to the system.</p>
+      </div>
+
+      <div *ngIf="studentsList.length > 0" class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Student Number</th>
+              <th>Grade</th>
+              <th>Section</th>
+              <th>Date of Birth</th>
+              <th>Enrollment Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of studentsList">
+              <td>{{ student.studentId }}</td>
+              <td>{{ student.user?.userName || 'N/A' }}</td>
+              <td>{{ student.user?.userEmail || 'N/A' }}</td>
+              <td>{{ student.user?.userContact || 'N/A' }}</td>
+              <td>{{ student.studentNumber }}</td>
+              <td>
+                <span *ngIf="student.grade_level" class="grade-badge">{{ student.grade_level.gradeName }}</span>
+                <span *ngIf="!student.grade_level && student.grade" class="grade-badge">{{ student.grade }}</span>
+                <span *ngIf="!student.grade_level && !student.grade" class="text-muted">Not Set</span>
+              </td>
+              <td>
+                <span *ngIf="student.section" class="section-badge">{{ student.section }}</span>
+                <span *ngIf="!student.section" class="text-muted">-</span>
+              </td>
+              <td>{{ student.dateOfBirth | date:'mediumDate' }}</td>
+              <td>{{ student.enrollmentDate | date:'mediumDate' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Teachers View -->
+    <div *ngIf="activeView === 'teachers'" class="content-view">
+      <div class="view-header">
+        <div>
+          <h2>👨‍🏫 Teachers Management</h2>
+          <p class="view-subtitle">Total Teachers: <strong>{{ totalTeachers }}</strong></p>
+        </div>
+        <button class="add-btn" (click)="toggleAddTeacherForm()">
+          {{ showAddTeacherForm ? '❌ Cancel' : '➕ Add Teacher' }}
+        </button>
+      </div>
+
+      <!-- Add Teacher Form -->
+      <div *ngIf="showAddTeacherForm" class="add-form">
+        <h3>Add New Teacher</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Username *</label>
+            <input type="text" [(ngModel)]="newTeacher.userName" placeholder="e.g. david_teacher" required>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="newTeacher.userEmail" placeholder="e.g. david@school.com" required>
+          </div>
+          <div class="form-group">
+            <label>Contact *</label>
+            <input type="text" [(ngModel)]="newTeacher.userContact" placeholder="e.g. 1234567890" required>
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="text" [(ngModel)]="newTeacher.password" placeholder="Default: teacher123" required>
+          </div>
+          <div class="form-group">
+            <label>Employee Number *</label>
+            <input type="text" [(ngModel)]="newTeacher.employeeNumber" placeholder="e.g. T004" required>
+          </div>
+          <div class="form-group">
+            <label>Department *</label>
+            <input type="text" [(ngModel)]="newTeacher.department" placeholder="e.g. History" required>
+          </div>
+          <div class="form-group">
+            <label>Specialization</label>
+            <input type="text" [(ngModel)]="newTeacher.specialization" placeholder="e.g. World History">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="submit-btn" (click)="addTeacher()">💾 Save Teacher</button>
+          <button class="cancel-btn" (click)="toggleAddTeacherForm()">Cancel</button>
+        </div>
+      </div>
+      
+      <div *ngIf="teachersList.length === 0 && !showAddTeacherForm" class="empty-state">
+        <p>📭 No teachers found in the database.</p>
+        <p>Click "Add Teacher" button to add a new teacher.</p>
+      </div>
+
+      <div *ngIf="teachersList.length > 0" class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Teacher ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Employee Number</th>
+              <th>Department</th>
+              <th>Specialization</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let teacher of teachersList">
+              <td>{{ teacher.teacher?.teacherId || 'N/A' }}</td>
+              <td>{{ teacher.userName }}</td>
+              <td>{{ teacher.userEmail }}</td>
+              <td>{{ teacher.userContact }}</td>
+              <td>{{ teacher.teacher?.employeeNumber || 'N/A' }}</td>
+              <td>{{ teacher.teacher?.department || 'N/A' }}</td>
+              <td>{{ teacher.teacher?.specialization || 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Guardians View -->
+    <div *ngIf="activeView === 'guardians'" class="content-view">
+      <div class="view-header">
+        <div>
+          <h2>👨‍👩‍👧‍👦 Parents & Guardians Management</h2>
+          <p class="view-subtitle">
+            Showing <strong>{{ getFilteredParentCount() }}</strong> of <strong>{{ totalParents }}</strong> parents
+          </p>
+        </div>
+        <button class="add-btn" (click)="toggleAddParentForm()">
+          {{ showAddParentForm ? '❌ Cancel' : '➕ Add Parent' }}
+        </button>
+      </div>
+
+      <!-- Parent Filters -->
+      <div class="filters-section">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="searchParents">Search Parents</label>
+            <input 
+              type="text" 
+              id="searchParents"
+              [(ngModel)]="parentFilters.searchTerm"
+              (input)="onParentFilterChange()"
+              placeholder="Search by name, email, contact, or occupation..."
+              class="search-input">
+          </div>
+          
+          <div class="filter-group">
+            <label for="filterOccupation">Filter by Occupation</label>
+            <select 
+              id="filterOccupation"
+              [(ngModel)]="parentFilters.occupation"
+              (change)="onParentFilterChange()"
+              class="filter-select">
+              <option value="">All Occupations</option>
+              <option *ngFor="let occupation of getUniqueOccupations()" [value]="occupation">
+                {{ occupation }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filterStudentAssignment">Student Assignment</label>
+            <select 
+              id="filterStudentAssignment"
+              [(ngModel)]="parentFilters.hasStudent"
+              (change)="onParentFilterChange()"
+              class="filter-select">
+              <option value="">All Parents</option>
+              <option value="yes">Has Student Assigned</option>
+              <option value="no">No Student Assigned</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button class="clear-filters-btn" (click)="clearParentFilters()" 
+                    [disabled]="!parentFilters.searchTerm && !parentFilters.occupation && !parentFilters.hasStudent">
+              🔄 Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Parent Form -->
+      <div *ngIf="showAddParentForm" class="add-form">
+        <h3>Add New Parent/Guardian</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Username *</label>
+            <input type="text" [(ngModel)]="newParent.userName" placeholder="e.g. john_parent" required>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="newParent.userEmail" placeholder="e.g. john@email.com" required>
+          </div>
+          <div class="form-group">
+            <label>Contact *</label>
+            <input type="text" [(ngModel)]="newParent.userContact" placeholder="e.g. 1234567890" required>
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="text" [(ngModel)]="newParent.password" placeholder="Default: parent123" required>
+          </div>
+          <div class="form-group">
+            <label>Occupation</label>
+            <input type="text" [(ngModel)]="newParent.occupation" placeholder="e.g. Engineer">
+          </div>
+          <div class="form-group">
+            <label>Student ID (Optional)</label>
+            <input type="number" [(ngModel)]="newParent.studentId" placeholder="Link to student">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="submit-btn" (click)="addParent()">💾 Save Parent</button>
+          <button class="cancel-btn" (click)="toggleAddParentForm()">Cancel</button>
+        </div>
+      </div>
+      
+      <!-- No Results Message -->
+      <div *ngIf="filteredParentsList.length === 0 && parentsList.length > 0 && !showAddParentForm" class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <h3>No parents found</h3>
+        <p>Try adjusting your filters or search terms</p>
+        <button class="btn-secondary" (click)="clearParentFilters()">Clear All Filters</button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="parentsList.length === 0 && !showAddParentForm" class="empty-state">
+        <p>📭 No parents/guardians found in the database.</p>
+        <p>Click "Add Parent" button to add a new parent/guardian.</p>
+      </div>
+
+      <!-- Parents Table -->
+      <div *ngIf="filteredParentsList.length > 0" class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Parent ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Occupation</th>
+              <th>Student</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let parent of filteredParentsList">
+              <td>{{ parent.parentId }}</td>
+              <td>
+                <div class="parent-name-cell">
+                  <div class="parent-avatar">{{ parent.user?.userName?.charAt(0) || 'P' }}</div>
+                  <span>{{ parent.user?.userName || 'N/A' }}</span>
+                </div>
+              </td>
+              <td>{{ parent.user?.userEmail || 'N/A' }}</td>
+              <td>{{ parent.user?.userContact || 'N/A' }}</td>
+              <td>
+                <span class="occupation-badge" *ngIf="parent.occupation">{{ parent.occupation }}</span>
+                <span class="no-occupation" *ngIf="!parent.occupation">Not specified</span>
+              </td>
+              <td>
+                <span class="student-badge" *ngIf="parent.student">
+                  👨‍🎓 {{ parent.student?.user?.userName || 'Unknown' }}
+                </span>
+                <span class="no-student" *ngIf="!parent.student">No student assigned</span>
+              </td>
+              <td>
+                <span class="status-badge active" *ngIf="parent.student">Active</span>
+                <span class="status-badge inactive" *ngIf="!parent.student">Inactive</span>
+              </td>
+              <td class="actions-cell">
+                <button class="action-btn view-btn" (click)="viewParent(parent)" title="View Details">👁️</button>
+                <button class="action-btn edit-btn" (click)="editParent(parent)" title="Edit Parent">✏️</button>
+                <button class="action-btn assign-btn" (click)="assignStudentToParent(parent)" title="Assign Student" *ngIf="!parent.student">🔗</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Subjects View -->
+    <div *ngIf="activeView === 'subjects'" class="content-view">
+      <h2>📚 Subjects Management</h2>
+      <p class="view-subtitle">Total Subjects: <strong>{{ totalSubjects }}</strong></p>
+      
+      <div *ngIf="subjectsList.length === 0" class="empty-state">
+        <p>📭 No subjects found in the database.</p>
+        <p>Subjects will appear here once they are added to the system.</p>
+      </div>
+
+      <div *ngIf="subjectsList.length > 0" class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Subject ID</th>
+              <th>Subject Name</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let subject of subjectsList">
+              <td>{{ subject.subjectId }}</td>
+              <td>{{ subject.subjectName }}</td>
+              <td>{{ subject.subjectType === 1 ? 'Core' : 'Elective' }}</td>
+              <td>{{ subject.description || 'N/A' }}</td>
+              <td>{{ subject.createdAt | date:'medium' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Administration View -->
+    <div *ngIf="activeView === 'administration'" class="content-view">
+      <h2>⚙️ Administration</h2>
+      <p>This section will display administration settings and configurations.</p>
+    </div>
+
+    <!-- Authentication View -->
+    <div *ngIf="activeView === 'authentication'" class="content-view">
+      <h2>🔐 Authentication</h2>
+      <p>This section will display user authentication and permissions management.</p>
+    </div>
+
+    <!-- Other Views -->
+    <div *ngIf="activeView === 'extra-activity'" class="content-view">
+      <h2>🏃‍♂️ Extra Curricular Activities</h2>
+      <p>This section will display extra curricular activities management.</p>
+    </div>
+
+    <div *ngIf="activeView === 'aptitude'" class="content-view">
+      <h2>⭐ Aptitude Tests</h2>
+      <p>This section will display aptitude test management.</p>
+    </div>
+
+    <div *ngIf="activeView === 'career'" class="content-view">
+      <h2>📈 Career Monitoring</h2>
+      <p>This section will display career monitoring and guidance features.</p>
+    </div>
+
+    <div *ngIf="activeView === 'reporting'" class="content-view">
+      <h2>📋 Reporting</h2>
+      <p>This section will display various reports and analytics.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Parent Detail Modal -->
+<div class="modal-overlay" *ngIf="showParentDetailModal" (click)="closeParentModals()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>👨‍👩‍👧‍👦 Parent Details</h3>
+      <button class="close-btn" (click)="closeParentModals()">✕</button>
+    </div>
+    <div class="modal-body" *ngIf="selectedParent">
+      <div class="parent-detail-info">
+        <div class="detail-row">
+          <label>Name:</label>
+          <span>{{ selectedParent.user.userName }}</span>
+        </div>
+        <div class="detail-row">
+          <label>Email:</label>
+          <span>{{ selectedParent.user.userEmail }}</span>
+        </div>
+        <div class="detail-row">
+          <label>Contact:</label>
+          <span>{{ selectedParent.user.userContact || 'Not provided' }}</span>
+        </div>
+        <div class="detail-row">
+          <label>Occupation:</label>
+          <span>{{ selectedParent.occupation || 'Not specified' }}</span>
+        </div>
+        <div class="detail-row">
+          <label>Student:</label>
+          <span *ngIf="selectedParent.student">{{ selectedParent.student.user.userName }}</span>
+          <span *ngIf="!selectedParent.student" class="no-student">No student assigned</span>
+        </div>
+        <div class="detail-row">
+          <label>Status:</label>
+          <span class="status-badge" [ngClass]="selectedParent.student ? 'active' : 'inactive'">
+            {{ selectedParent.student ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeParentModals()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Parent Modal -->
+<div class="modal-overlay" *ngIf="showEditParentModal" (click)="closeParentModals()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>✏️ Edit Parent</h3>
+      <button class="close-btn" (click)="closeParentModals()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form class="edit-form">
+        <div class="form-group">
+          <label for="editUserName">Name:</label>
+          <input type="text" id="editUserName" [(ngModel)]="editParentForm.userName" name="userName" required>
+        </div>
+        <div class="form-group">
+          <label for="editUserEmail">Email:</label>
+          <input type="email" id="editUserEmail" [(ngModel)]="editParentForm.userEmail" name="userEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="editUserContact">Contact:</label>
+          <input type="text" id="editUserContact" [(ngModel)]="editParentForm.userContact" name="userContact">
+        </div>
+        <div class="form-group">
+          <label for="editOccupation">Occupation:</label>
+          <input type="text" id="editOccupation" [(ngModel)]="editParentForm.occupation" name="occupation">
+        </div>
+        <div class="form-group">
+          <label for="editPassword">New Password (optional):</label>
+          <input type="password" id="editPassword" [(ngModel)]="editParentForm.password" name="password" placeholder="Leave empty to keep current password">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeParentModals()">Cancel</button>
+      <button class="btn-primary" (click)="saveParentEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Student Modal -->
+<div class="modal-overlay" *ngIf="showAssignStudentModal" (click)="closeParentModals()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>👨‍👧‍👦 Assign Student to Parent</h3>
+      <button class="close-btn" (click)="closeParentModals()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="assign-info" *ngIf="selectedParent">
+        <p><strong>Parent:</strong> {{ selectedParent.user.userName }}</p>
+        <p><strong>Email:</strong> {{ selectedParent.user.userEmail }}</p>
+      </div>
+      
+      <div class="form-group">
+        <label for="assignStudent">Select Student:</label>
+        <select id="assignStudent" [(ngModel)]="assignStudentForm.studentId" name="studentId" required>
+          <option value="">Choose a student...</option>
+          <option *ngFor="let student of studentsWithoutParents" [value]="student.studentId">
+            {{ student.user.userName }} ({{ student.user.userEmail }})
+          </option>
+        </select>
+      </div>
+      
+      <div *ngIf="studentsWithoutParents.length === 0" class="no-students-message">
+        <p>📚 No students available for assignment. All students already have parents assigned.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeParentModals()">Cancel</button>
+      <button class="btn-primary" (click)="saveStudentAssignment()" [disabled]="!assignStudentForm.studentId || studentsWithoutParents.length === 0">
+        Assign Student
+      </button>
+    </div>
+  </div>
+</div>

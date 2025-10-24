@@ -1,0 +1,2082 @@
+<div class="dashboard-container">
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>TEACHER PORTAL</h3>
+      <div class="logo-placeholder">LOGO</div>
+      <button class="menu-toggle">☰</button>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a (click)="setActiveView('dashboard')" [class.active]="isActive('dashboard')" class="nav-item">
+        <span class="nav-icon">📊</span>
+        Dashboard
+      </a>
+      <a (click)="setActiveView('students')" [class.active]="isActive('students')" class="nav-item">
+        <span class="nav-icon">👨‍🎓</span>
+        My Students
+      </a>
+      <a (click)="setActiveView('subjects')" [class.active]="isActive('subjects')" class="nav-item">
+        <span class="nav-icon">📚</span>
+        Subjects
+      </a>
+      <a (click)="setActiveView('attendance')" [class.active]="isActive('attendance')" class="nav-item">
+        <span class="nav-icon">📅</span>
+        Attendance
+      </a>
+      <a (click)="setActiveView('tests')" [class.active]="isActive('tests')" class="nav-item">
+        <span class="nav-icon">📝</span>
+        Tests & Exams
+      </a>
+      <a (click)="setActiveView('grades')" [class.active]="isActive('grades')" class="nav-item">
+        <span class="nav-icon">📈</span>
+        Grades & Marks
+      </a>
+      <a (click)="setActiveView('reports')" [class.active]="isActive('reports')" class="nav-item">
+        <span class="nav-icon">📋</span>
+        Reports
+      </a>
+      <a (click)="setActiveView('messages')" [class.active]="isActive('messages')" class="nav-item">
+        <span class="nav-icon">💬</span>
+        Messages
+      </a>
+      <a (click)="setActiveView('settings')" [class.active]="isActive('settings')" class="nav-item">
+        <span class="nav-icon">⚙️</span>
+        Settings
+      </a>
+      <a (click)="logout()" class="nav-item logout-item">
+        <span class="nav-icon">🚪</span>
+        Logout
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <span class="header-icon">👨‍🏫</span>
+        <h1>Teacher Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <span class="user-info">{{ teacherName }}</span>
+        <div class="user-avatar">👨‍🏫</div>
+      </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div *ngIf="activeView === 'dashboard'">
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card my-students">
+        <div class="card-content">
+          <h3>My Students</h3>
+          <div class="card-stats">
+            <span class="stat-label">Total Students</span>
+            <span class="stat-value">{{ students.length }} Students</span>
+            <span class="stat-icon">👨‍🎓</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card attendance-rate">
+        <div class="card-content">
+          <h3>My Subjects</h3>
+          <div class="card-stats">
+            <span class="stat-label">Total Subjects</span>
+            <span class="stat-value">{{ subjects.length }}</span>
+            <span class="stat-icon">📚</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card pending-grades">
+        <div class="card-content">
+          <h3>Total Tests</h3>
+          <div class="card-stats">
+            <span class="stat-label">Created Tests</span>
+            <span class="stat-value">{{ tests.length }} Tests</span>
+            <span class="stat-icon">📝</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards Grid -->
+    <div class="dashboard-grid">
+      <div class="dashboard-card class-schedule">
+        <div class="card-icon">📅</div>
+        <div class="card-text">Class Schedule</div>
+        <div class="card-count">Today: 4</div>
+      </div>
+      
+      <div class="dashboard-card student-list">
+        <div class="card-icon">👥</div>
+        <div class="card-text">Student List</div>
+        <div class="card-count">{{ students.length }}</div>
+      </div>
+      
+      <div class="dashboard-card mark-attendance">
+        <div class="card-icon">✅</div>
+        <div class="card-text">Mark Attendance</div>
+      </div>
+      
+      <div class="dashboard-card add-marks">
+        <div class="card-icon">📊</div>
+        <div class="card-text">Add Marks</div>
+      </div>
+      
+      <div class="dashboard-card view-grades">
+        <div class="card-icon">📈</div>
+        <div class="card-text">View Grades</div>
+      </div>
+      
+      <div class="dashboard-card create-test">
+        <div class="card-icon">📝</div>
+        <div class="card-text">Create Test</div>
+      </div>
+      
+      <div class="dashboard-card student-progress">
+        <div class="card-icon">📊</div>
+        <div class="card-text">Student Progress</div>
+      </div>
+      
+      <div class="dashboard-card messages">
+        <div class="card-icon">💬</div>
+        <div class="card-text">Messages</div>
+        <div class="card-count">3</div>
+      </div>
+      
+      <div class="dashboard-card reports">
+        <div class="card-icon">📋</div>
+        <div class="card-text">Reports</div>
+      </div>
+      
+      <div class="dashboard-card notifications">
+        <div class="card-icon">🔔</div>
+        <div class="card-text">Notifications</div>
+        <div class="card-count">5</div>
+      </div>
+      
+      <div class="dashboard-card profile">
+        <div class="card-icon">👤</div>
+        <div class="card-text">Profile</div>
+      </div>
+      
+      <div class="dashboard-card settings">
+        <div class="card-icon">⚙️</div>
+        <div class="card-text">Settings</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- My Students View -->
+    <div *ngIf="activeView === 'students'" class="content-view">
+      <div class="view-header">
+        <h2>My Students</h2>
+        <p>View and manage your students</p>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading students...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage && !isLoading" class="error-alert">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Students Table -->
+      <div *ngIf="!isLoading && students.length > 0" class="students-table-container">
+        <div class="table-header">
+          <div class="student-count">
+            <span class="count-badge">{{ getFilteredStudentCount() }}</span>
+            <span>Students ({{ students.length }} total)</span>
+          </div>
+          <div class="table-actions">
+            <button class="btn-secondary">
+              <span>📥</span> Export
+            </button>
+            <button class="btn-primary" (click)="openAddStudentModal()">
+              <span>➕</span> Add Student
+            </button>
+          </div>
+        </div>
+
+        <!-- Student Filters -->
+        <div class="student-filters">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label for="searchStudents">Search Students</label>
+              <input 
+                type="text" 
+                id="searchStudents"
+                [(ngModel)]="studentFilters.searchTerm"
+                (input)="onStudentFilterChange()"
+                placeholder="Search by name, email, or student number..."
+                class="search-input">
+            </div>
+            
+            <div class="filter-group">
+              <label for="filterGrade">Filter by Grade</label>
+              <select 
+                id="filterGrade"
+                [(ngModel)]="studentFilters.grade"
+                (change)="onStudentFilterChange()"
+                class="filter-select">
+                <option value="">All Grades</option>
+                <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+                  {{ grade.gradeName }}
+                </option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filterSection">Filter by Section</label>
+              <select 
+                id="filterSection"
+                [(ngModel)]="studentFilters.section"
+                (change)="onStudentFilterChange()"
+                class="filter-select">
+                <option value="">All Sections</option>
+                <option *ngFor="let section of availableSections" [value]="section">
+                  Section {{ section }}
+                </option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filterStatus">Filter by Status</label>
+              <select 
+                id="filterStatus"
+                [(ngModel)]="studentFilters.status"
+                (change)="onStudentFilterChange()"
+                class="filter-select">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+
+            <div class="filter-actions">
+              <button class="btn-clear" (click)="clearStudentFilters()" 
+                      [disabled]="!studentFilters.grade && !studentFilters.section && !studentFilters.status && !studentFilters.searchTerm">
+                <span>🔄</span> Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div *ngIf="filteredStudents.length === 0 && students.length > 0" class="no-results">
+          <div class="no-results-icon">🔍</div>
+          <h3>No students found</h3>
+          <p>Try adjusting your filters or search terms</p>
+          <button class="btn-secondary" (click)="clearStudentFilters()">Clear All Filters</button>
+        </div>
+
+        <table class="students-table" *ngIf="filteredStudents.length > 0">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Grade</th>
+              <th>Section</th>
+              <th>Parent</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of filteredStudents" class="student-row">
+              <td class="student-id">{{ student.studentNumber }}</td>
+              <td class="student-name">
+                <div class="name-cell">
+                  <div class="student-avatar">{{ student.name.charAt(0) }}</div>
+                  <span>{{ student.name }}</span>
+                </div>
+              </td>
+              <td>{{ student.email }}</td>
+              <td>
+                <span *ngIf="student.grade" class="grade-badge">{{ student.grade }}</span>
+                <span *ngIf="!student.grade" class="text-muted">Not Set</span>
+              </td>
+              <td>
+                <span *ngIf="student.section" class="section-badge">{{ student.section }}</span>
+                <span *ngIf="!student.section" class="text-muted">-</span>
+              </td>
+              <td>
+                <span *ngIf="student.parentName" class="parent-badge">
+                  👨‍👩‍👦 {{ student.parentName }}
+                </span>
+                <button *ngIf="!student.parentName" class="action-btn parent-btn" (click)="openAssignParentModal(student)" title="Assign Parent">
+                  ➕ Parent
+                </button>
+              </td>
+              <td class="actions-cell">
+                <button class="action-btn view-btn" (click)="viewStudentDetails(student)" title="View Details">👁️</button>
+                <button class="action-btn edit-btn" (click)="openEditStudentModal(student)" title="Edit">✏️</button>
+                <button class="action-btn report-btn" (click)="generateStudentReport(student)" title="Generate Report">📊</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Students State -->
+      <div *ngIf="!isLoading && students.length === 0" class="empty-state">
+        <p class="empty-icon">👨‍🎓</p>
+        <p class="empty-message">No students found</p>
+        <button class="btn-primary" (click)="openAddStudentModal()">➕ Add Your First Student</button>
+      </div>
+    </div>
+
+    <!-- Subjects View -->
+    <div *ngIf="activeView === 'subjects'" class="content-view">
+      <div class="view-header">
+        <h2>My Subjects</h2>
+        <p>View and manage subjects you teach</p>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading subjects...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage && !isLoading" class="error-alert">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Subjects Grid -->
+      <div *ngIf="!isLoading && subjects.length > 0" class="subjects-grid">
+        <div class="grid-header">
+          <div class="subject-count">
+            <span class="count-badge">{{ subjects.length }}</span>
+            <span>Total Subjects</span>
+          </div>
+          <div class="grid-actions">
+            <button class="btn-secondary">
+              <span>📥</span> Export
+            </button>
+            <button class="btn-primary" (click)="openAddSubjectModal()">
+              <span>➕</span> Add Subject
+            </button>
+          </div>
+        </div>
+
+        <div class="subjects-cards">
+          <div *ngFor="let subject of subjects" class="subject-card" [class.academic]="subject.type === 'Academic'" [class.non-academic]="subject.type === 'Non-Academic'">
+            <div class="card-header">
+              <div class="subject-icon">
+                <span *ngIf="subject.type === 'Academic'">📚</span>
+                <span *ngIf="subject.type === 'Non-Academic'">🎨</span>
+              </div>
+              <span class="subject-type-badge" [class.academic]="subject.type === 'Academic'" [class.non-academic]="subject.type === 'Non-Academic'">
+                {{ subject.type }}
+              </span>
+            </div>
+            
+            <h3 class="subject-name">{{ subject.name }}</h3>
+            <p class="subject-description">{{ subject.description }}</p>
+            
+            <div class="subject-stats">
+              <div class="stat-item">
+                <span class="stat-icon">👨‍🏫</span>
+                <div class="stat-info">
+                  <span class="stat-label">Teachers</span>
+                  <span class="stat-value">{{ subject.teachersCount }}</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">👨‍🎓</span>
+                <div class="stat-info">
+                  <span class="stat-label">Students</span>
+                  <span class="stat-value">{{ subject.studentsCount }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-actions">
+              <button class="action-btn view-btn" (click)="viewSubjectDetails(subject)" title="View Details">
+                <span>👁️</span> View
+              </button>
+              <button class="action-btn edit-btn" (click)="editSubject(subject)" title="Edit">
+                <span>✏️</span> Edit
+              </button>
+              <button class="action-btn manage-btn" (click)="manageSubject(subject)" title="Manage">
+                <span>⚙️</span> Manage
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Subjects State -->
+      <div *ngIf="!isLoading && subjects.length === 0" class="empty-state">
+        <p class="empty-icon">📚</p>
+        <p class="empty-message">No subjects found</p>
+        <button class="btn-primary">Add Your First Subject</button>
+      </div>
+    </div>
+
+    <!-- Attendance View -->
+    <div *ngIf="activeView === 'attendance'" class="content-view">
+      <div class="view-header">
+        <h2>Attendance Management</h2>
+        <p>Mark and manage student attendance</p>
+      </div>
+
+      <!-- Date and Grade Selector -->
+      <div class="attendance-controls">
+        <div class="date-selector">
+          <label for="attendanceDate">Select Date:</label>
+          <input 
+            type="date" 
+            id="attendanceDate" 
+            [(ngModel)]="selectedDate"
+            (change)="onDateChange()"
+            class="date-input"
+          >
+        </div>
+        <div class="grade-selector">
+          <label for="gradeFilter">Filter by Grade:</label>
+          <select 
+            id="gradeFilter"
+            [(ngModel)]="selectedGradeForAttendance"
+            (ngModelChange)="loadAttendance()"
+            class="grade-filter-select"
+          >
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+        </div>
+        <div class="section-selector">
+          <label for="sectionFilter">Filter by Section:</label>
+          <select 
+            id="sectionFilter"
+            [(ngModel)]="selectedSectionForAttendance"
+            (ngModelChange)="loadAttendance()"
+            class="section-filter-select"
+          >
+            <option value="">All Sections</option>
+            <option *ngFor="let section of availableSections" [value]="section">
+              Section {{ section }}
+            </option>
+          </select>
+        </div>
+        <div class="report-btn-container">
+          <button class="btn-report" (click)="generateAttendanceReport()" title="Generate Report">
+            📊 Generate Report
+          </button>
+          <button class="btn-clear-filters" (click)="clearAttendanceFilters()" 
+                  [disabled]="!selectedGradeForAttendance && !selectedSectionForAttendance"
+                  title="Clear Filters">
+            🔄 Clear Filters
+          </button>
+        </div>
+        <div class="attendance-stats">
+          <div class="stat-box present">
+            <span class="stat-number">{{ presentCount }}</span>
+            <span class="stat-label">Present</span>
+          </div>
+          <div class="stat-box absent">
+            <span class="stat-number">{{ absentCount }}</span>
+            <span class="stat-label">Absent</span>
+          </div>
+          <div class="stat-box late">
+            <span class="stat-number">{{ lateCount }}</span>
+            <span class="stat-label">Late</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading attendance...</p>
+      </div>
+
+      <!-- Attendance Table -->
+      <div *ngIf="!isLoading && attendance.length > 0" class="attendance-table-container">
+        <table class="attendance-table">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Student Name</th>
+              <th>Grade</th>
+              <th>Section</th>
+              <th>Status</th>
+              <th>Mark Attendance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of attendance" [class.marked]="record.status !== 'pending'">
+              <td class="student-id">{{ record.studentNumber }}</td>
+              <td class="student-name">
+                <div class="name-cell">
+                  <div class="student-avatar">{{ record.studentName.charAt(0) }}</div>
+                  <span>{{ record.studentName }}</span>
+                </div>
+              </td>
+              <td>
+                <span *ngIf="record.grade" class="grade-badge">{{ record.grade }}</span>
+                <span *ngIf="!record.grade" class="text-muted">-</span>
+              </td>
+              <td>
+                <span *ngIf="record.section" class="section-badge">{{ record.section }}</span>
+                <span *ngIf="!record.section" class="text-muted">-</span>
+              </td>
+              <td class="status-cell">
+                <span class="status-badge" 
+                      [class.present]="record.status === 'Present'"
+                      [class.absent]="record.status === 'Absent'"
+                      [class.late]="record.status === 'Late'"
+                      [class.pending]="record.status === 'pending'">
+                  <span *ngIf="record.status === 'Present'">✓ Present</span>
+                  <span *ngIf="record.status === 'Absent'">✗ Absent</span>
+                  <span *ngIf="record.status === 'Late'">⏰ Late</span>
+                  <span *ngIf="record.status === 'pending'">⊙ Pending</span>
+                </span>
+              </td>
+              <td class="actions-cell">
+                <div class="attendance-actions">
+                  <button 
+                    class="attendance-btn present-btn" 
+                    (click)="markAttendance(record.studentId, 'present')"
+                    [class.active]="record.status === 'Present'"
+                    title="Mark Present">
+                    ✓
+                  </button>
+                  <button 
+                    class="attendance-btn late-btn" 
+                    (click)="markAttendance(record.studentId, 'late')"
+                    [class.active]="record.status === 'Late'"
+                    title="Mark Late">
+                    ⏰
+                  </button>
+                  <button 
+                    class="attendance-btn absent-btn" 
+                    (click)="markAttendance(record.studentId, 'absent')"
+                    [class.active]="record.status === 'Absent'"
+                    title="Mark Absent">
+                    ✗
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="attendance-footer">
+          <button class="btn-primary save-btn" (click)="saveAttendance()" [disabled]="isLoading">
+            <span *ngIf="!isLoading">💾 Save Attendance</span>
+            <span *ngIf="isLoading">Saving...</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- No Students State -->
+      <div *ngIf="!isLoading && attendance.length === 0" class="empty-state">
+        <p class="empty-icon">📋</p>
+        <p class="empty-message">No students to mark attendance</p>
+        <p>Please add students first</p>
+      </div>
+    </div>
+
+    <!-- Tests & Exams View -->
+    <div *ngIf="activeView === 'tests'" class="content-view">
+      <div class="view-header">
+        <div>
+          <h2>Tests & Exams</h2>
+          <p>Create and manage tests, exams, and student results</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-primary" (click)="openAddTestModal()">
+            <span>➕</span> Create Test
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading tests...</p>
+      </div>
+
+      <!-- Tests Grid -->
+      <div *ngIf="!isLoading && tests.length > 0" class="tests-grid">
+        <div *ngFor="let test of tests" class="test-card">
+          <div class="test-header">
+            <div class="test-type-badge" [class.exam]="test.testType === 1" [class.event]="test.testType === 2">
+              <span *ngIf="test.testType === 1">📝 Exam</span>
+              <span *ngIf="test.testType === 2">🏆 Event</span>
+            </div>
+            <div class="test-date">
+              📅 {{ test.testDate }}
+            </div>
+          </div>
+
+          <div class="test-body">
+            <h3 class="test-subject">{{ test.subjectName }}</h3>
+            <div class="test-info">
+              <div class="info-row" *ngIf="test.testMark">
+                <span class="info-label">Total Marks:</span>
+                <span class="info-value">{{ test.testMark }}</span>
+              </div>
+              <div class="info-row" *ngIf="test.testDescription">
+                <span class="info-label">Description:</span>
+                <span class="info-value">{{ test.testDescription }}</span>
+              </div>
+              <div class="info-row" *ngIf="test.teacherName">
+                <span class="info-label">Teacher:</span>
+                <span class="info-value">{{ test.teacherName }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="test-footer">
+            <button class="test-action-btn view" (click)="viewTestDetails(test)" title="View Details">
+              👁️ View
+            </button>
+            <button class="test-action-btn edit" (click)="editTest(test)" title="Edit Test">
+              ✏️ Edit
+            </button>
+            <button class="test-action-btn results" (click)="manageTestResults(test)" title="Manage Results">
+              📊 Results
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Tests State -->
+      <div *ngIf="!isLoading && tests.length === 0" class="empty-state">
+        <p class="empty-icon">📝</p>
+        <p class="empty-message">No tests found</p>
+        <button class="btn-primary" (click)="openAddTestModal()">Create Your First Test</button>
+      </div>
+    </div>
+
+    <!-- Grades & Marks View -->
+    <div *ngIf="activeView === 'grades'" class="content-view">
+      <div class="view-header">
+        <div>
+          <h2>Grades & Marks</h2>
+          <p>View and manage student performance across all subjects</p>
+        </div>
+        <div class="header-actions">
+          <select class="filter-select" [(ngModel)]="selectedGradeForAttendance" (change)="applyGradesFilter()">
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+          <select class="filter-select" [(ngModel)]="gradesFilter" (change)="applyGradesFilter()">
+            <option value="all">All Performance</option>
+            <option value="high">High Performers (≥85%)</option>
+            <option value="medium">Medium Performers (70-84%)</option>
+            <option value="low">Need Attention (<70%)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading grades...</p>
+      </div>
+
+      <!-- Grades Table -->
+      <div *ngIf="!isLoading && studentGrades.length > 0" class="grades-container">
+        <div class="grades-table-wrapper">
+          <table class="grades-table">
+            <thead>
+              <tr>
+                <th class="sticky-col">Student</th>
+                <th>Student ID</th>
+                <th>Grade</th>
+                <th>Section</th>
+                <th>Total Tests</th>
+                <th>Average Marks</th>
+                <th>Overall Grade</th>
+                <th>Performance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let student of studentGrades" 
+                  [class.high-performer]="student.averageMarks >= 85"
+                  [class.medium-performer]="student.averageMarks >= 70 && student.averageMarks < 85"
+                  [class.low-performer]="student.averageMarks < 70">
+                <td class="sticky-col student-cell">
+                  <div class="name-cell">
+                    <div class="student-avatar">{{ student.name.charAt(0) }}</div>
+                    <span>{{ student.name }}</span>
+                  </div>
+                </td>
+                <td class="student-id">{{ student.studentNumber }}</td>
+                <td>
+                  <span *ngIf="student.grade" class="grade-badge">{{ student.grade }}</span>
+                  <span *ngIf="!student.grade" class="text-muted">-</span>
+                </td>
+                <td>
+                  <span *ngIf="student.section" class="section-badge">{{ student.section }}</span>
+                  <span *ngIf="!student.section" class="text-muted">-</span>
+                </td>
+                <td class="text-center">{{ student.totalTests }}</td>
+                <td>
+                  <div class="marks-display">
+                    <span class="marks-badge" 
+                          [class.high]="student.averageMarks >= 85"
+                          [class.medium]="student.averageMarks >= 70 && student.averageMarks < 85"
+                          [class.low]="student.averageMarks < 70">
+                      {{ student.averageMarks.toFixed(1) }}%
+                    </span>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <span class="grade-badge" [class]="getGradeClass(student.overallGrade)">
+                    {{ student.overallGrade }}
+                  </span>
+                </td>
+                <td>
+                  <div class="performance-bar">
+                    <div class="performance-fill" 
+                         [style.width.%]="student.averageMarks"
+                         [class.high]="student.averageMarks >= 85"
+                         [class.medium]="student.averageMarks >= 70 && student.averageMarks < 85"
+                         [class.low]="student.averageMarks < 70">
+                    </div>
+                  </div>
+                </td>
+                <td class="actions-cell">
+                  <button class="action-btn view-btn" (click)="viewStudentGrades(student)" title="View All Grades">
+                    📊 Details
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- No Grades State -->
+      <div *ngIf="!isLoading && studentGrades.length === 0" class="empty-state">
+        <p class="empty-icon">📊</p>
+        <p class="empty-message">No grade data available</p>
+        <p>Add test results to see student grades here</p>
+      </div>
+    </div>
+
+    <!-- Reports View -->
+    <div *ngIf="activeView === 'reports'" class="content-view">
+      <div class="view-header">
+        <div>
+          <h2>Reports & Analytics</h2>
+          <p>Generate comprehensive reports and analyze student performance</p>
+        </div>
+      </div>
+
+      <!-- Report Types Grid -->
+      <div class="reports-grid">
+        
+        <!-- Overall Performance Report -->
+        <div class="report-card">
+          <div class="report-icon overall">📊</div>
+          <h3>Overall Performance Report</h3>
+          <p>Complete academic performance analysis of all students</p>
+          <select class="report-select" [(ngModel)]="selectedGradeForReport">
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+          <button class="btn-generate" (click)="generateOverallReport()">
+            Generate Report
+          </button>
+        </div>
+
+        <!-- Attendance Report -->
+        <div class="report-card">
+          <div class="report-icon attendance">📅</div>
+          <h3>Attendance Summary Report</h3>
+          <p>Comprehensive attendance analysis by student and subject</p>
+          <select class="report-select" [(ngModel)]="selectedGradeForReport">
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+          <div class="date-range-inputs">
+            <input type="date" [(ngModel)]="reportDateFrom" class="small-input" placeholder="From">
+            <input type="date" [(ngModel)]="reportDateTo" class="small-input" placeholder="To">
+          </div>
+          <button class="btn-generate" (click)="generateAttendanceSummaryReport()">
+            Generate Report
+          </button>
+        </div>
+
+        <!-- Subject Performance Report -->
+        <div class="report-card">
+          <div class="report-icon subject">📚</div>
+          <h3>Subject Performance Report</h3>
+          <p>Analyze student performance by specific subject</p>
+          <select class="report-select" [(ngModel)]="selectedGradeForReport">
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+          <select class="report-select" [(ngModel)]="selectedSubjectForReport">
+            <option value="">-- Select Subject --</option>
+            <option *ngFor="let subject of subjects" [value]="subject.id">
+              {{ subject.name }}
+            </option>
+          </select>
+          <button class="btn-generate" (click)="generateSubjectReport()" [disabled]="!selectedSubjectForReport">
+            Generate Report
+          </button>
+        </div>
+
+        <!-- Top Performers Report -->
+        <div class="report-card">
+          <div class="report-icon top">🏆</div>
+          <h3>Top Performers Report</h3>
+          <p>List of highest achieving students across all subjects</p>
+          <select class="report-select" [(ngModel)]="selectedGradeForReport">
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+          <button class="btn-generate" (click)="generateTopPerformersReport()">
+            Generate Report
+          </button>
+        </div>
+
+        <!-- Students Needing Attention -->
+        <div class="report-card">
+          <div class="report-icon attention">⚠️</div>
+          <h3>Students Needing Attention</h3>
+          <p>Identify students who may need additional support</p>
+          <select class="report-select" [(ngModel)]="selectedGradeForReport">
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+          <button class="btn-generate warning" (click)="generateLowPerformersReport()">
+            Generate Report
+          </button>
+        </div>
+
+        <!-- Class Summary Report -->
+        <div class="report-card">
+          <div class="report-icon class">👥</div>
+          <h3>Class Summary Report</h3>
+          <p>Overview of class performance, attendance, and statistics</p>
+          <select class="report-select" [(ngModel)]="selectedGradeForReport">
+            <option value="">All Grades</option>
+            <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+              {{ grade.gradeName }}
+            </option>
+          </select>
+          <button class="btn-generate" (click)="generateClassSummaryReport()">
+            Generate Report
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <h3>📈 Quick Statistics</h3>
+        <div class="stats-grid-reports">
+          <div class="stat-card-report success">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+              <span class="stat-number">{{ students.length }}</span>
+              <span class="stat-label">Total Students</span>
+            </div>
+          </div>
+          <div class="stat-card-report info">
+            <div class="stat-icon">📝</div>
+            <div class="stat-content">
+              <span class="stat-number">{{ tests.length }}</span>
+              <span class="stat-label">Total Tests</span>
+            </div>
+          </div>
+          <div class="stat-card-report primary">
+            <div class="stat-icon">📚</div>
+            <div class="stat-content">
+              <span class="stat-number">{{ subjects.length }}</span>
+              <span class="stat-label">Total Subjects</span>
+            </div>
+          </div>
+          <div class="stat-card-report warning">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-content">
+              <span class="stat-number">{{ lowPerformersCount }}</span>
+              <span class="stat-label">Need Attention</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages View -->
+    <div *ngIf="activeView === 'messages'" class="content-view">
+      <h2>Messages</h2>
+      <p>View and send messages.</p>
+      <div class="placeholder-content">
+        <p>🚧 This feature is under development</p>
+        <p>You will be able to communicate with students and parents.</p>
+      </div>
+    </div>
+
+    <!-- Settings View -->
+    <div *ngIf="activeView === 'settings'" class="content-view">
+      <h2>Settings</h2>
+      <p>Manage your account settings.</p>
+      <div class="placeholder-content">
+        <p>🚧 This feature is under development</p>
+        <p>You will be able to update your profile, change password, and manage preferences.</p>
+      </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div *ngIf="showAddStudentModal" class="modal-overlay" (click)="closeAddStudentModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Add New Student</h2>
+          <button class="close-btn" (click)="closeAddStudentModal()">✕</button>
+        </div>
+        
+        <form class="modal-form" (ngSubmit)="addStudent()">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="userName">Username <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="userName" 
+                [(ngModel)]="newStudent.userName" 
+                name="userName"
+                placeholder="Enter username"
+                required
+              >
+            </div>
+            
+            <div class="form-group">
+              <label for="studentNumber">Student Number <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="studentNumber" 
+                [(ngModel)]="newStudent.studentNumber" 
+                name="studentNumber"
+                placeholder="e.g. S006"
+                required
+              >
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="userEmail">Email <span class="required">*</span></label>
+              <input 
+                type="email" 
+                id="userEmail" 
+                [(ngModel)]="newStudent.userEmail" 
+                name="userEmail"
+                placeholder="student@school.com"
+                required
+              >
+            </div>
+            
+            <div class="form-group">
+              <label for="userContact">Contact Number</label>
+              <input 
+                type="tel" 
+                id="userContact" 
+                [(ngModel)]="newStudent.userContact" 
+                name="userContact"
+                placeholder="Phone number"
+              >
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Password <span class="required">*</span></label>
+              <input 
+                type="password" 
+                id="password" 
+                [(ngModel)]="newStudent.password" 
+                name="password"
+                placeholder="Enter password"
+                required
+              >
+            </div>
+            
+            <div class="form-group">
+              <label for="dateOfBirth">Date of Birth</label>
+              <input 
+                type="date" 
+                id="dateOfBirth" 
+                [(ngModel)]="newStudent.dateOfBirth" 
+                name="dateOfBirth"
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="enrollmentDate">Enrollment Date</label>
+            <input 
+              type="date" 
+              id="enrollmentDate" 
+              [(ngModel)]="newStudent.enrollmentDate" 
+              name="enrollmentDate"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="gradeId">Grade/Class <span class="required">*</span></label>
+            <select 
+              id="gradeId" 
+              [(ngModel)]="newStudent.gradeId" 
+              (ngModelChange)="onGradeChange($event)"
+              name="gradeId"
+              required
+            >
+              <option value="">-- Select Grade --</option>
+              <option *ngFor="let grade of gradesList" [value]="grade.gradeId">
+                {{ grade.gradeName }}
+              </option>
+            </select>
+            <small *ngIf="newStudent.gradeId" class="form-hint">Selected: {{ getGradeName(newStudent.gradeId) }}</small>
+          </div>
+
+          <div class="form-group">
+            <label for="section">Section <span class="required">*</span></label>
+            <select 
+              id="section" 
+              [(ngModel)]="newStudent.section" 
+              name="section"
+              required
+            >
+              <option value="">-- Select Section --</option>
+              <option value="A">Section A</option>
+              <option value="B">Section B</option>
+              <option value="C">Section C</option>
+              <option value="D">Section D</option>
+              <option value="E">Section E</option>
+            </select>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeAddStudentModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="isLoading">
+              <span *ngIf="!isLoading">Add Student</span>
+              <span *ngIf="isLoading">Adding...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Subject Modal -->
+    <div *ngIf="showAddSubjectModal" class="modal-overlay" (click)="closeAddSubjectModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Add New Subject</h2>
+          <button class="close-btn" (click)="closeAddSubjectModal()">✕</button>
+        </div>
+        
+        <form class="modal-form" (ngSubmit)="addSubject()">
+          <div class="form-group">
+            <label for="subjectName">Subject Name <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="subjectName" 
+              [(ngModel)]="newSubject.subjectName" 
+              name="subjectName"
+              placeholder="e.g. Advanced Mathematics"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="subjectType">Subject Type <span class="required">*</span></label>
+            <select 
+              id="subjectType" 
+              [(ngModel)]="newSubject.subjectType" 
+              name="subjectType"
+              class="form-select"
+              required
+            >
+              <option value="1">📚 Academic</option>
+              <option value="2">🎨 Non-Academic</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea 
+              id="description" 
+              [(ngModel)]="newSubject.description" 
+              name="description"
+              placeholder="Brief description of the subject..."
+              rows="4"
+              class="form-textarea"
+            ></textarea>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeAddSubjectModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="isLoading">
+              <span *ngIf="!isLoading">Add Subject</span>
+              <span *ngIf="isLoading">Adding...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Parent Modal -->
+  <div class="modal-overlay" *ngIf="showAssignParentModal" (click)="closeAssignParentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>👨‍👩‍👦 Assign Parent to {{ selectedStudent?.name }}</h3>
+        <button class="modal-close" (click)="closeAssignParentModal()">✕</button>
+      </div>
+      
+      <div class="modal-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="parentModalTab === 'create'"
+          (click)="parentModalTab = 'create'">
+          Create New Parent
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="parentModalTab === 'existing'"
+          (click)="parentModalTab = 'existing'">
+          Select Existing Parent
+        </button>
+      </div>
+      
+      <!-- Create New Parent Tab -->
+      <form *ngIf="parentModalTab === 'create'" class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="parentName">Parent Name *</label>
+            <input 
+              type="text" 
+              id="parentName" 
+              [(ngModel)]="newParent.userName"
+              name="parentName"
+              placeholder="Enter parent name"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="parentEmail">Email *</label>
+            <input 
+              type="email" 
+              id="parentEmail" 
+              [(ngModel)]="newParent.userEmail"
+              name="parentEmail"
+              placeholder="Enter email address"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="parentPassword">Password *</label>
+            <input 
+              type="password" 
+              id="parentPassword" 
+              [(ngModel)]="newParent.password"
+              name="parentPassword"
+              placeholder="Minimum 6 characters"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="parentContact">Contact Number</label>
+            <input 
+              type="tel" 
+              id="parentContact" 
+              [(ngModel)]="newParent.userContact"
+              name="parentContact"
+              placeholder="Enter phone number">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="occupation">Occupation</label>
+          <input 
+            type="text" 
+            id="occupation" 
+            [(ngModel)]="newParent.occupation"
+            name="occupation"
+            placeholder="Enter occupation">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeAssignParentModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="button" class="btn-primary" (click)="createAndAssignParent()" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Create & Assign Parent</span>
+            <span *ngIf="isLoading">Creating...</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Select Existing Parent Tab -->
+      <div *ngIf="parentModalTab === 'existing'" class="existing-parents">
+        <div *ngIf="availableParents.length === 0" class="empty-state">
+          <p class="empty-icon">👨‍👩‍👦</p>
+          <p class="empty-message">No available parents found</p>
+          <p>All parents are already assigned to students or you haven't created any parents yet.</p>
+        </div>
+
+        <div *ngIf="availableParents.length > 0" class="parents-list">
+          <div *ngFor="let parent of availableParents" class="parent-item" (click)="assignExistingParent(parent)">
+            <div class="parent-info">
+              <div class="parent-avatar">{{ parent.name?.charAt(0) || 'P' }}</div>
+              <div class="parent-details">
+                <h4>{{ parent.name }}</h4>
+                <p>{{ parent.email }}</p>
+                <span *ngIf="parent.occupation" class="occupation-badge">{{ parent.occupation }}</span>
+              </div>
+            </div>
+            <button class="assign-btn">Assign</button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeAssignParentModal()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Details Modal -->
+  <div class="modal-overlay" *ngIf="showStudentDetailsModal" (click)="closeStudentDetailsModal()">
+    <div class="modal-content details-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>👨‍🎓 Student Details</h3>
+        <button class="modal-close" (click)="closeStudentDetailsModal()">✕</button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading student details...</p>
+      </div>
+
+      <!-- Student Details Content -->
+      <div *ngIf="!isLoading && studentDetails" class="details-content">
+        
+        <!-- Basic Information -->
+        <div class="details-section">
+          <h4 class="section-title">📋 Basic Information</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Full Name:</span>
+              <span class="detail-value">{{ studentDetails.name }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Student Number:</span>
+              <span class="detail-value student-number">{{ studentDetails.studentNumber }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Email:</span>
+              <span class="detail-value">{{ studentDetails.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Contact:</span>
+              <span class="detail-value">{{ studentDetails.contact }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Date of Birth:</span>
+              <span class="detail-value">{{ studentDetails.dateOfBirth }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Enrollment Date:</span>
+              <span class="detail-value">{{ studentDetails.enrollmentDate }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parent Information -->
+        <div class="details-section">
+          <h4 class="section-title">👨‍👩‍👦 Parent/Guardian Information</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Parent Name:</span>
+              <span class="detail-value">{{ studentDetails.parentName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Parent Email:</span>
+              <span class="detail-value">{{ studentDetails.parentEmail }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Parent Contact:</span>
+              <span class="detail-value">{{ studentDetails.parentContact }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Performance -->
+        <div class="details-section">
+          <h4 class="section-title">📊 Academic Performance</h4>
+          
+          <div *ngIf="studentDetails.testResults && studentDetails.testResults.length > 0" class="test-results">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Test Date</th>
+                  <th>Marks Obtained</th>
+                  <th>Grade</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let result of studentDetails.testResults">
+                  <td>{{ result.test?.subject?.subjectName || 'N/A' }}</td>
+                  <td>{{ result.test?.testDate || 'N/A' }}</td>
+                  <td>
+                    <span class="marks-badge" 
+                          [class.high]="result.marksObtained >= 85" 
+                          [class.medium]="result.marksObtained >= 70 && result.marksObtained < 85" 
+                          [class.low]="result.marksObtained < 70">
+                      {{ result.marksObtained }}
+                    </span>
+                  </td>
+                  <td>{{ result.grade || 'N/A' }}</td>
+                  <td>{{ result.remarks || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!studentDetails.testResults || studentDetails.testResults.length === 0" class="empty-state-small">
+            <p>📝 No test results available yet</p>
+          </div>
+        </div>
+
+        <!-- Attendance Summary -->
+        <div class="details-section">
+          <h4 class="section-title">📅 Attendance Summary</h4>
+          
+          <div *ngIf="studentDetails.attendance && studentDetails.attendance.length > 0" class="attendance-summary">
+            <div class="attendance-stats-grid">
+              <div class="stat-card present">
+                <div class="stat-icon">✓</div>
+                <div class="stat-info">
+                  <span class="stat-number">{{ studentPresentCount }}</span>
+                  <span class="stat-label">Present</span>
+                </div>
+              </div>
+              <div class="stat-card absent">
+                <div class="stat-icon">✗</div>
+                <div class="stat-info">
+                  <span class="stat-number">{{ studentAbsentCount }}</span>
+                  <span class="stat-label">Absent</span>
+                </div>
+              </div>
+              <div class="stat-card late">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-info">
+                  <span class="stat-number">{{ studentLateCount }}</span>
+                  <span class="stat-label">Late</span>
+                </div>
+              </div>
+              <div class="stat-card total">
+                <div class="stat-icon">📊</div>
+                <div class="stat-info">
+                  <span class="stat-number">{{ studentDetails.attendance.length }}</span>
+                  <span class="stat-label">Total Days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!studentDetails.attendance || studentDetails.attendance.length === 0" class="empty-state-small">
+            <p>📅 No attendance records available yet</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="closeStudentDetailsModal()">
+          Close
+        </button>
+        <button type="button" class="btn-primary">
+          📊 Generate Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Student Modal -->
+  <div class="modal-overlay" *ngIf="showEditStudentModal" (click)="closeEditStudentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>✏️ Edit Student Information</h3>
+        <button class="modal-close" (click)="closeEditStudentModal()">✕</button>
+      </div>
+      
+      <form class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editStudentName">Student Name *</label>
+            <input 
+              type="text" 
+              id="editStudentName" 
+              [(ngModel)]="editStudent.userName"
+              name="editStudentName"
+              placeholder="Enter student name"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="editStudentEmail">Email *</label>
+            <input 
+              type="email" 
+              id="editStudentEmail" 
+              [(ngModel)]="editStudent.userEmail"
+              name="editStudentEmail"
+              placeholder="Enter email address"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editStudentNumber">Student Number *</label>
+            <input 
+              type="text" 
+              id="editStudentNumber" 
+              [(ngModel)]="editStudent.studentNumber"
+              name="editStudentNumber"
+              placeholder="e.g., STU001"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="editStudentContact">Contact Number</label>
+            <input 
+              type="tel" 
+              id="editStudentContact" 
+              [(ngModel)]="editStudent.userContact"
+              name="editStudentContact"
+              placeholder="Enter phone number">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editDateOfBirth">Date of Birth</label>
+            <input 
+              type="date" 
+              id="editDateOfBirth" 
+              [(ngModel)]="editStudent.dateOfBirth"
+              name="editDateOfBirth">
+          </div>
+
+          <div class="form-group">
+            <label for="editEnrollmentDate">Enrollment Date</label>
+            <input 
+              type="date" 
+              id="editEnrollmentDate" 
+              [(ngModel)]="editStudent.enrollmentDate"
+              name="editEnrollmentDate">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeEditStudentModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="button" class="btn-primary" (click)="updateStudentInfo()" [disabled]="isLoading">
+            <span *ngIf="!isLoading">💾 Update Student</span>
+            <span *ngIf="isLoading">Updating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Subject Details Modal -->
+  <div class="modal-overlay" *ngIf="showSubjectDetailsModal" (click)="closeSubjectDetailsModal()">
+    <div class="modal-content details-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📚 Subject Details</h3>
+        <button class="modal-close" (click)="closeSubjectDetailsModal()">✕</button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading subject details...</p>
+      </div>
+
+      <!-- Subject Details Content -->
+      <div *ngIf="!isLoading && (subjectDetails || selectedSubject)" class="details-content">
+        
+        <!-- Basic Information -->
+        <div class="details-section">
+          <h4 class="section-title">📋 Subject Information</h4>
+          <div class="subject-header-info">
+            <div class="subject-icon-large">
+              <span *ngIf="(subjectDetails?.subjectType || selectedSubject?.type) === 'Academic' || (subjectDetails?.subjectType || selectedSubject?.type) === 1">📚</span>
+              <span *ngIf="(subjectDetails?.subjectType || selectedSubject?.type) === 'Non-Academic' || (subjectDetails?.subjectType || selectedSubject?.type) === 2">🎨</span>
+            </div>
+            <div class="subject-header-text">
+              <h2>{{ subjectDetails?.subjectName || selectedSubject?.name }}</h2>
+              <span class="type-badge" 
+                    [class.academic]="(subjectDetails?.subjectType || selectedSubject?.subjectType) === 1"
+                    [class.non-academic]="(subjectDetails?.subjectType || selectedSubject?.subjectType) === 2">
+                {{ (subjectDetails?.subjectType || selectedSubject?.subjectType) === 1 ? 'Academic' : 'Non-Academic' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="description-box">
+            <h5>Description</h5>
+            <p>{{ subjectDetails?.description || selectedSubject?.description || 'No description provided' }}</p>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="details-section">
+          <h4 class="section-title">📊 Statistics</h4>
+          <div class="subject-stats-grid">
+            <div class="stat-card-large primary">
+              <div class="stat-icon-large">👨‍🏫</div>
+              <div class="stat-info-large">
+                <span class="stat-number-large">{{ subjectDetails?.teachers?.length || selectedSubject?.teachersCount || 0 }}</span>
+                <span class="stat-label-large">Teachers Assigned</span>
+              </div>
+            </div>
+            <div class="stat-card-large success">
+              <div class="stat-icon-large">👨‍🎓</div>
+              <div class="stat-info-large">
+                <span class="stat-number-large">{{ subjectDetails?.students?.length || selectedSubject?.studentsCount || 0 }}</span>
+                <span class="stat-label-large">Students Enrolled</span>
+              </div>
+            </div>
+            <div class="stat-card-large info">
+              <div class="stat-icon-large">📝</div>
+              <div class="stat-info-large">
+                <span class="stat-number-large">{{ subjectDetails?.tests?.length || 0 }}</span>
+                <span class="stat-label-large">Tests Created</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teachers List -->
+        <div class="details-section" *ngIf="subjectDetails?.teachers && subjectDetails.teachers.length > 0">
+          <h4 class="section-title">👨‍🏫 Assigned Teachers</h4>
+          <div class="teachers-list">
+            <div *ngFor="let teacher of subjectDetails.teachers" class="teacher-card">
+              <div class="teacher-avatar">{{ teacher.user?.userName?.charAt(0) || 'T' }}</div>
+              <div class="teacher-info">
+                <h5>{{ teacher.user?.userName || 'Unknown' }}</h5>
+                <p>{{ teacher.user?.userEmail || 'N/A' }}</p>
+                <span class="department-badge" *ngIf="teacher.department">{{ teacher.department }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!subjectDetails?.teachers || subjectDetails.teachers.length === 0" class="details-section">
+          <h4 class="section-title">👨‍🏫 Assigned Teachers</h4>
+          <div class="empty-state-small">
+            <p>👨‍🏫 No teachers assigned to this subject yet</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="closeSubjectDetailsModal()">
+          Close
+        </button>
+        <button type="button" class="btn-primary" (click)="closeSubjectDetailsModal(); editSubject(selectedSubject)">
+          ✏️ Edit Subject
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Subject Modal -->
+  <div class="modal-overlay" *ngIf="showEditSubjectModal" (click)="closeEditSubjectModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>✏️ Edit Subject</h3>
+        <button class="modal-close" (click)="closeEditSubjectModal()">✕</button>
+      </div>
+      
+      <form class="modal-form">
+        <div class="form-group">
+          <label for="editSubjectName">Subject Name *</label>
+          <input 
+            type="text" 
+            id="editSubjectName" 
+            [(ngModel)]="editSubjectData.subjectName"
+            name="editSubjectName"
+            placeholder="e.g., Mathematics, Physics"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="editSubjectType">Subject Type *</label>
+          <select 
+            id="editSubjectType" 
+            [(ngModel)]="editSubjectData.subjectType"
+            name="editSubjectType"
+            required>
+            <option value="1">📚 Academic</option>
+            <option value="2">🎨 Non-Academic</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editSubjectDescription">Description</label>
+          <textarea 
+            id="editSubjectDescription" 
+            [(ngModel)]="editSubjectData.description"
+            name="editSubjectDescription"
+            placeholder="Enter subject description (optional)"
+            rows="4"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeEditSubjectModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="button" class="btn-primary" (click)="updateSubject()" [disabled]="isLoading">
+            <span *ngIf="!isLoading">💾 Update Subject</span>
+            <span *ngIf="isLoading">Updating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Manage Subject Modal -->
+  <div class="modal-overlay" *ngIf="showManageSubjectModal" (click)="closeManageSubjectModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>⚙️ Manage Subject: {{ selectedSubject?.name }}</h3>
+        <button class="modal-close" (click)="closeManageSubjectModal()">✕</button>
+      </div>
+      
+      <div class="manage-content">
+        <div class="manage-section">
+          <h4>Subject Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Subject Name</span>
+              <span class="info-value">{{ selectedSubject?.name }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Type</span>
+              <span class="info-value">{{ selectedSubject?.type }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Description</span>
+              <span class="info-value">{{ selectedSubject?.description || 'No description' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="manage-section">
+          <h4>Statistics</h4>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-icon">👨‍🏫</span>
+              <span class="stat-number">{{ selectedSubject?.teachersCount || 0 }}</span>
+              <span class="stat-label">Teachers</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon">👨‍🎓</span>
+              <span class="stat-number">{{ selectedSubject?.studentsCount || 0 }}</span>
+              <span class="stat-label">Students</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="manage-section danger-zone">
+          <h4>⚠️ Danger Zone</h4>
+          <p>Once you delete a subject, there is no going back. Please be certain.</p>
+          <button class="btn-danger" (click)="deleteSubject(selectedSubject)" [disabled]="isLoading">
+            <span *ngIf="!isLoading">🗑️ Delete Subject</span>
+            <span *ngIf="isLoading">Deleting...</span>
+          </button>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeManageSubjectModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Test Modal -->
+  <div class="modal-overlay" *ngIf="showAddTestModal" (click)="closeAddTestModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📝 Create New Test</h3>
+        <button class="modal-close" (click)="closeAddTestModal()">✕</button>
+      </div>
+      
+      <form class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="testType">Test Type *</label>
+            <select 
+              id="testType" 
+              [(ngModel)]="newTest.testType"
+              name="testType"
+              required>
+              <option value="1">📝 Exam</option>
+              <option value="2">🏆 Non-Academic Event</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="testDate">Test Date *</label>
+            <input 
+              type="date" 
+              id="testDate" 
+              [(ngModel)]="newTest.testDate"
+              name="testDate"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="testSubject">Subject *</label>
+            <select 
+              id="testSubject" 
+              [(ngModel)]="newTest.subjectId"
+              name="testSubject"
+              required>
+              <option value="">-- Select Subject --</option>
+              <option *ngFor="let subject of subjects" [value]="subject.id">
+                {{ subject.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="testMark">Total Marks</label>
+            <input 
+              type="number" 
+              id="testMark" 
+              [(ngModel)]="newTest.testMark"
+              name="testMark"
+              placeholder="e.g., 100"
+              min="0">
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="newTest.testType == 1">
+          <label for="testClass">Class/Grade</label>
+          <input 
+            type="number" 
+            id="testClass" 
+            [(ngModel)]="newTest.testClass"
+            name="testClass"
+            placeholder="e.g., 10 for Grade 10"
+            min="1"
+            max="12">
+        </div>
+
+        <div class="form-group">
+          <label for="testDescription">Description</label>
+          <textarea 
+            id="testDescription" 
+            [(ngModel)]="newTest.testDescription"
+            name="testDescription"
+            placeholder="Enter test description (optional)"
+            rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeAddTestModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="button" class="btn-primary" (click)="addTest()" [disabled]="isLoading">
+            <span *ngIf="!isLoading">➕ Create Test</span>
+            <span *ngIf="isLoading">Creating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Test Modal -->
+  <div class="modal-overlay" *ngIf="showEditTestModal" (click)="closeEditTestModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>✏️ Edit Test</h3>
+        <button class="modal-close" (click)="closeEditTestModal()">✕</button>
+      </div>
+      
+      <form class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editTestDate">Test Date *</label>
+            <input 
+              type="date" 
+              id="editTestDate" 
+              [(ngModel)]="editTestData.testDate"
+              name="editTestDate"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="editTestMark">Total Marks</label>
+            <input 
+              type="number" 
+              id="editTestMark" 
+              [(ngModel)]="editTestData.testMark"
+              name="editTestMark"
+              placeholder="e.g., 100"
+              min="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editTestDescription">Description</label>
+          <textarea 
+            id="editTestDescription" 
+            [(ngModel)]="editTestData.testDescription"
+            name="editTestDescription"
+            placeholder="Enter test description (optional)"
+            rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeEditTestModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="button" class="btn-primary" (click)="updateTest()" [disabled]="isLoading">
+            <span *ngIf="!isLoading">💾 Update Test</span>
+            <span *ngIf="isLoading">Updating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Test Details Modal -->
+  <div class="modal-overlay" *ngIf="showTestDetailsModal" (click)="closeTestDetailsModal()">
+    <div class="modal-content details-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📝 Test Details</h3>
+        <button class="modal-close" (click)="closeTestDetailsModal()">✕</button>
+      </div>
+
+      <div class="details-content" *ngIf="selectedTest">
+        <div class="details-section">
+          <h4 class="section-title">📋 Test Information</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Subject:</span>
+              <span class="detail-value">{{ selectedTest.subjectName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Test Type:</span>
+              <span class="detail-value">{{ selectedTest.testType === 1 ? 'Exam' : 'Event' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Test Date:</span>
+              <span class="detail-value">{{ selectedTest.testDate }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Total Marks:</span>
+              <span class="detail-value">{{ selectedTest.testMark || 'N/A' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Teacher:</span>
+              <span class="detail-value">{{ selectedTest.teacherName }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedTest.testDescription">
+              <span class="detail-label">Description:</span>
+              <span class="detail-value">{{ selectedTest.testDescription }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="closeTestDetailsModal()">
+          Close
+        </button>
+        <button type="button" class="btn-primary" (click)="closeTestDetailsModal(); manageTestResults(selectedTest)">
+          📊 Manage Results
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Test Results Modal -->
+  <div class="modal-overlay" *ngIf="showManageTestResultsModal" (click)="closeManageTestResultsModal()">
+    <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📊 Manage Test Results: {{ selectedTest?.subjectName }}</h3>
+        <button class="modal-close" (click)="closeManageTestResultsModal()">✕</button>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-state">
+        <p>⏳ Loading test results...</p>
+      </div>
+
+      <div *ngIf="!isLoading" class="results-content">
+        <div *ngIf="testResults.length > 0" class="results-table-container">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Marks Obtained</th>
+                <th>Grade</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let result of testResults">
+                <td>{{ result.studentNumber }}</td>
+                <td>{{ result.studentName }}</td>
+                <td>
+                  <span class="marks-badge"
+                        [class.high]="result.marksObtained >= 85"
+                        [class.medium]="result.marksObtained >= 70 && result.marksObtained < 85"
+                        [class.low]="result.marksObtained < 70">
+                    {{ result.marksObtained }}
+                  </span>
+                </td>
+                <td>{{ result.grade || 'N/A' }}</td>
+                <td>{{ result.remarks || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="testResults.length === 0" class="empty-state-small">
+          <p>📝 No results entered for this test yet</p>
+          <p>Add student results to track performance</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="closeManageTestResultsModal()">
+          Close
+        </button>
+        <button type="button" class="btn-primary" (click)="openAddResultModal()">
+          ➕ Add Student Result
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Student Result Modal -->
+  <div class="modal-overlay" *ngIf="showAddResultModal" (click)="closeAddResultModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>➕ Add Student Result</h3>
+        <button class="modal-close" (click)="closeAddResultModal()">✕</button>
+      </div>
+      
+      <form class="modal-form">
+        <div class="form-group">
+          <label for="resultStudent">Select Student *</label>
+          <select 
+            id="resultStudent" 
+            [(ngModel)]="newResult.studentId"
+            name="resultStudent"
+            required>
+            <option value="">-- Select Student --</option>
+            <option *ngFor="let student of students" [value]="student.id">
+              {{ student.studentNumber }} - {{ student.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="marksObtained">Marks Obtained *</label>
+            <input 
+              type="number" 
+              id="marksObtained" 
+              [(ngModel)]="newResult.marksObtained"
+              name="marksObtained"
+              placeholder="e.g., 85"
+              [max]="selectedTest?.testMark || 100"
+              min="0"
+              required>
+            <small *ngIf="selectedTest?.testMark">Out of {{ selectedTest.testMark }}</small>
+          </div>
+
+          <div class="form-group">
+            <label for="grade">Grade</label>
+            <select 
+              id="grade" 
+              [(ngModel)]="newResult.grade"
+              name="grade">
+              <option value="">-- Auto Calculate --</option>
+              <option value="A+">A+</option>
+              <option value="A">A</option>
+              <option value="B+">B+</option>
+              <option value="B">B</option>
+              <option value="C+">C+</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="F">F</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="resultRemarks">Remarks</label>
+          <textarea 
+            id="resultRemarks" 
+            [(ngModel)]="newResult.remarks"
+            name="resultRemarks"
+            placeholder="Enter any remarks or notes (optional)"
+            rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeAddResultModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="button" class="btn-primary" (click)="addStudentResult()" [disabled]="isLoading">
+            <span *ngIf="!isLoading">💾 Save Result</span>
+            <span *ngIf="isLoading">Saving...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

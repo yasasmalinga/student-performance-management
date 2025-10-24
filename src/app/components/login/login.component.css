@@ -1,0 +1,357 @@
+/* Login Container */
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-wrapper {
+  display: flex;
+  max-width: 1000px;
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  min-height: 600px;
+}
+
+/* Left Section - Branding */
+.branding-section {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.branding-panel {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  margin: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 2;
+}
+
+.welcome-message h2 {
+  color: #333;
+  margin: 0 0 30px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Logo Section */
+.logo-section {
+  margin-bottom: 30px;
+}
+
+.main-logo {
+  position: relative;
+  display: inline-block;
+}
+
+.smart-text {
+  font-size: 36px;
+  font-weight: bold;
+  color: #4A90E2;
+  margin-right: 5px;
+}
+
+.student-text {
+  font-size: 36px;
+  font-weight: bold;
+  color: #E74C3C;
+}
+
+.logo-decoration {
+  position: absolute;
+  top: -10px;
+  right: -20px;
+}
+
+.graduation-cap {
+  font-size: 20px;
+  position: absolute;
+  top: -5px;
+  right: 10px;
+}
+
+.pencil {
+  font-size: 16px;
+  position: absolute;
+  top: 15px;
+  right: -5px;
+}
+
+/* Illustration */
+.illustration {
+  margin: 30px 0;
+  position: relative;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.student-character {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.character-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.head, .shirt, .pants {
+  font-size: 24px;
+  margin: 2px 0;
+}
+
+.books-stack {
+  position: relative;
+  margin-left: 20px;
+}
+
+.book {
+  width: 40px;
+  height: 8px;
+  border-radius: 2px;
+  margin: 2px 0;
+}
+
+.book-1 {
+  background: #FFD700;
+  margin-left: 5px;
+}
+
+.book-2 {
+  background: #4A90E2;
+}
+
+.book-3 {
+  background: #E74C3C;
+  margin-left: -5px;
+}
+
+.laptop {
+  font-size: 20px;
+  margin-left: 10px;
+}
+
+/* Tagline */
+.tagline {
+  margin-top: 30px;
+}
+
+.small-logo {
+  font-size: 18px;
+  font-weight: bold;
+  color: #4A90E2;
+  margin-bottom: 5px;
+}
+
+.tagline-text {
+  font-style: italic;
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Right Section - Form */
+.form-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.signin-form {
+  width: 100%;
+  max-width: 400px;
+}
+
+.signin-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* Form Styles */
+.form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 2px solid #e0e0e0;
+  background: transparent;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  border-bottom-color: #4A90E2;
+}
+
+.form-input.error {
+  border-bottom-color: #E74C3C;
+}
+
+.input-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #4A90E2;
+  transition: width 0.3s ease;
+}
+
+.form-input:focus + .input-underline {
+  width: 100%;
+}
+
+/* Checkbox */
+.form-options {
+  margin-bottom: 30px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  accent-color: #4A90E2;
+}
+
+/* Login Button */
+.login-button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.login-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Error Message */
+.error-message {
+  margin-top: 15px;
+  padding: 10px;
+  background: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;
+    max-width: 400px;
+  }
+  
+  .branding-section {
+    min-height: 300px;
+  }
+  
+  .branding-panel {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .form-section {
+    padding: 20px;
+  }
+  
+  .smart-text, .student-text {
+    font-size: 28px;
+  }
+  
+  .illustration {
+    height: 150px;
+  }
+  
+  .head, .shirt, .pants {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 10px;
+  }
+  
+  .branding-panel {
+    padding: 15px;
+  }
+  
+  .welcome-message h2 {
+    font-size: 20px;
+  }
+  
+  .smart-text, .student-text {
+    font-size: 24px;
+  }
+  
+  .signin-title {
+    font-size: 28px;
+  }
+}
