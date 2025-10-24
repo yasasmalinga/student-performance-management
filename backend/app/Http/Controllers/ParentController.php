@@ -13,7 +13,7 @@ class ParentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ParentModel::with('user', 'student.user');
+        $query = ParentModel::with(['user', 'students.user']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -23,15 +23,17 @@ class ParentController extends Controller
             });
         }
 
-        $parents = $query->paginate(15);
+        $parents = $query->get();
 
-        return response()->json($parents);
+        return response()->json([
+            'data' => $parents
+        ]);
     }
 
     public function show($id)
     {
         try {
-            $parent = ParentModel::with('user', 'student.user')->findOrFail($id);
+            $parent = ParentModel::with(['user', 'students.user'])->findOrFail($id);
             
             return response()->json([
                 'success' => true,
@@ -112,7 +114,6 @@ class ParentController extends Controller
             $parent = ParentModel::create([
                 'userId' => $user->userId,
                 'occupation' => $validated['occupation'] ?? null,
-                'studentId' => $validated['studentId'] ?? null,
             ]);
 
             // If studentId is provided, update the student's parentId
@@ -124,7 +125,7 @@ class ParentController extends Controller
             DB::commit();
             
             // Load user relationship
-            $parent->load('user', 'student');
+            $parent->load('user', 'students');
             
             return response()->json([
                 'message' => 'Parent created successfully',
@@ -196,7 +197,7 @@ class ParentController extends Controller
             DB::commit();
             
             // Load relationships
-            $parent->load('user', 'student');
+            $parent->load('user', 'students');
             
             return response()->json([
                 'message' => 'Parent updated successfully',
@@ -223,20 +224,50 @@ class ParentController extends Controller
         try {
             $parent = ParentModel::findOrFail($parentId);
             
-            // Update parent's studentId
-            $parent->update(['studentId' => $validated['studentId']]);
-            
-            // Update student's parentId
+            // Update student's parentId (no need to update parent since we removed studentId field)
             Student::where('studentId', $validated['studentId'])
                 ->update(['parentId' => $parent->userId]);
 
             return response()->json([
                 'message' => 'Parent linked to student successfully',
-                'parent' => $parent->load('user', 'student')
+                'parent' => $parent->load('user', 'students')
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to link parent to student',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $parent = ParentModel::with('user')->findOrFail($id);
+            $user = $parent->user;
+
+            // Remove parent association from students
+            Student::where('parentId', $user->userId)
+                ->update(['parentId' => null]);
+
+            // Delete parent record
+            $parent->delete();
+
+            // Delete user record
+            $user->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Parent deleted successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Parent deletion failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to delete parent',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -13,7 +13,7 @@ class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Student::with(['user', 'gradeLevel']);
+        $query = Student::with(['user', 'gradeLevel', 'parent', 'parent.parent']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -101,8 +101,13 @@ class StudentController extends Controller
 
     public function show($id)
     {
-        $student = Student::with(['user', 'parent', 'testResults.test.subject', 'attendance'])
-            ->findOrFail($id);
+        $student = Student::with([
+            'user', 
+            'parent', 
+            'parent.parent', // Load the parent's ParentModel to get occupation
+            'testResults.test.subject', 
+            'attendance'
+        ])->findOrFail($id);
         
         return response()->json($student);
     }
@@ -187,6 +192,15 @@ class StudentController extends Controller
 
         try {
             $student = Student::findOrFail($id);
+            
+            // Check if student already has a parent assigned
+            if ($student->parentId && $validated['parentId']) {
+                return response()->json([
+                    'message' => 'Student already has a parent assigned. Please remove the current parent before assigning a new one.',
+                    'error' => 'DUPLICATE_PARENT_ASSIGNMENT'
+                ], 400);
+            }
+            
             $student->update(['parentId' => $validated['parentId']]);
 
             return response()->json([

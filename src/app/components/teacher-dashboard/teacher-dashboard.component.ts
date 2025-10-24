@@ -152,6 +152,7 @@ export class TeacherDashboardComponent implements OnInit {
       this.loadStudents();
       this.loadSubjects();
       this.loadTests();
+      this.loadParents();
     }
   }
 
@@ -260,7 +261,8 @@ export class TeacherDashboardComponent implements OnInit {
           attendance: student.attendanceRate || '0%',
           status: 'Active',
           parentId: student.parentId,
-          parentName: student.parent?.user?.userName || null
+          parentName: student.parent?.user?.userName || null,
+          parentOccupation: student.parent?.parent?.occupation || null
         }));
         
         // Initialize filtered students
@@ -521,7 +523,10 @@ export class TeacherDashboardComponent implements OnInit {
 
     this.isLoading = true;
 
-    this.apiService.getAttendanceReport(this.reportDateFrom, this.reportDateTo).subscribe({
+    // Pass grade filter if selected
+    const gradeId = this.selectedGradeForReport ? parseInt(this.selectedGradeForReport) : undefined;
+    
+    this.apiService.getAttendanceReport(this.reportDateFrom, this.reportDateTo, gradeId).subscribe({
       next: (response) => {
         const reportHtml = this.createAttendanceSummaryReportHtml(response);
         this.openReportInNewWindow(reportHtml);
@@ -676,31 +681,39 @@ export class TeacherDashboardComponent implements OnInit {
     const totalAbsent = students.reduce((sum: number, s: any) => sum + parseInt(s.absentDays || 0), 0);
     const totalLate = students.reduce((sum: number, s: any) => sum + parseInt(s.lateDays || 0), 0);
     
+    // Get grade name for the report title
+    const gradeName = this.selectedGradeForReport ? this.getGradeName(this.selectedGradeForReport) : 'All Grades';
+    const reportTitle = gradeName === 'All Grades' ? 'Attendance Summary Report' : `${gradeName} - Attendance Summary Report`;
+    
     const rows = students.map((s: any) => `
       <tr>
         <td>${s.studentNumber}</td>
         <td>${s.userName}</td>
+        <td>${s.gradeName || 'N/A'}</td>
         <td>${s.totalDays}</td>
         <td class="present">${s.presentDays}</td>
         <td class="absent">${s.absentDays}</td>
         <td class="late">${s.lateDays}</td>
-        <td><span class="marks-badge">${parseFloat(s.attendancePercentage).toFixed(1)}%</span></td>
+        <td><span class="marks-badge">${parseFloat(s.attendancePercentage || 0).toFixed(1)}%</span></td>
       </tr>
     `).join('');
 
-    return this.createReportTemplate('Attendance Summary Report', `
+    return this.createReportTemplate(reportTitle, `
       <div class="summary-box">
         <h3>Period: ${this.reportDateFrom} to ${this.reportDateTo}</h3>
+        <p><strong>Grade:</strong> ${gradeName}</p>
         <p><strong>Total Students:</strong> ${totalStudents}</p>
         <p><strong>Total Present:</strong> ${totalPresent} days</p>
         <p><strong>Total Absent:</strong> ${totalAbsent} days</p>
         <p><strong>Total Late:</strong> ${totalLate} days</p>
+        <p><strong>Overall Attendance Rate:</strong> ${totalStudents > 0 ? ((totalPresent / (totalPresent + totalAbsent + totalLate)) * 100).toFixed(1) : 0}%</p>
       </div>
       <table>
         <thead>
           <tr>
             <th>Student ID</th>
             <th>Student Name</th>
+            <th>Grade</th>
             <th>Total Days</th>
             <th>Present</th>
             <th>Absent</th>
@@ -2111,6 +2124,7 @@ export class TeacherDashboardComponent implements OnInit {
           parentName: response.parent?.userName || 'Not Assigned',
           parentEmail: response.parent?.userEmail || 'N/A',
           parentContact: response.parent?.userContact || 'N/A',
+          parentOccupation: response.parent?.parent?.occupation || 'N/A',
           testResults: response.test_results || response.testResults || [],
           attendance: response.attendance || []
         };
@@ -2150,14 +2164,37 @@ export class TeacherDashboardComponent implements OnInit {
     return this.studentDetails?.attendance?.filter((a: any) => a.status === 'Late').length || 0;
   }
 
-  // Parent Management Methods
-  openAssignParentModal(student: any) {
-    this.selectedStudent = student;
-    this.showAssignParentModal = true;
-    this.parentModalTab = 'create';
-    this.resetNewParentForm();
-    this.loadAvailableParents();
-  }
+  // Parent Management Properties
+  parentsList: any[] = [];
+  filteredParentsList: any[] = [];
+  parentSearchTerm: string = '';
+  parentOccupationFilter: string = '';
+  parentStatusFilter: string = '';
+  parentOccupations: string[] = [];
+  
+  // Parent Modals
+  showAddParentModal: boolean = false;
+  showEditParentModal: boolean = false;
+  showParentDetailsModal: boolean = false;
+  selectedParentDetails: any = null;
+  
+  // Parent Forms
+  newParentForm: any = {
+    userName: '',
+    userEmail: '',
+    password: '',
+    userContact: '',
+    occupation: ''
+  };
+  
+  editParentForm: any = {
+    userName: '',
+    userEmail: '',
+    userContact: '',
+    occupation: ''
+  };
+  
+  selectedParentForEdit: any = null;
 
   closeAssignParentModal() {
     this.showAssignParentModal = false;
@@ -2168,8 +2205,8 @@ export class TeacherDashboardComponent implements OnInit {
   resetNewParentForm() {
     this.newParent = {
       userName: '',
-      password: '',
       userEmail: '',
+      password: '',
       userContact: '',
       occupation: ''
     };
@@ -2183,12 +2220,87 @@ export class TeacherDashboardComponent implements OnInit {
     this.apiService.getParents().subscribe({
       next: (response) => {
         console.log('Parents loaded:', response);
-        // Filter parents that don't have a student assigned
-        this.availableParents = response.data?.filter((parent: any) => !parent.studentId) || [];
+        // Map the API response to match frontend expectations
+        this.availableParents = response.data?.map((parent: any) => ({
+          id: parent.parentId,
+          name: parent.user?.userName || 'Unknown',
+          email: parent.user?.userEmail || '',
+          contact: parent.user?.userContact || '',
+          occupation: parent.occupation || '',
+          students: parent.students || []
+        })) || [];
       },
       error: (error) => {
         console.error('Error loading parents:', error);
         this.availableParents = [];
+      }
+    });
+  }
+
+  openChangeParentModal(student: any) {
+    this.selectedStudent = student;
+    this.showAssignParentModal = true;
+    this.parentModalTab = 'existing';
+    this.loadAvailableParents();
+  }
+
+  removeParentFromStudent(student: any) {
+    if (confirm(`Are you sure you want to remove the parent from ${student.name}?`)) {
+      this.isLoading = true;
+      
+      this.apiService.updateStudentParent(student.id, null as any).subscribe({
+        next: (response) => {
+          console.log('Parent removed:', response);
+          alert(`Parent removed from ${student.name} successfully!`);
+          this.loadStudents(); // Refresh students list
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error removing parent:', error);
+          let errorMessage = 'Failed to remove parent. ';
+          if (error.error && error.error.message) {
+            errorMessage += error.error.message;
+          } else if (error.message) {
+            errorMessage += error.message;
+          }
+          alert(errorMessage);
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  assignExistingParent(parent: any) {
+    if (!this.selectedStudent) {
+      alert('No student selected');
+      return;
+    }
+
+    this.isLoading = true;
+
+    // Update student's parentId
+    this.apiService.updateStudentParent(this.selectedStudent.id, parent.id).subscribe({
+      next: (response) => {
+        console.log('Parent assigned:', response);
+        alert(`Parent ${parent.name} assigned to ${this.selectedStudent.name} successfully!`);
+        this.closeAssignParentModal();
+        this.loadStudents(); // Refresh students list
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error assigning parent:', error);
+        let errorMessage = 'Failed to assign parent. ';
+        
+        if (error.error && error.error.error === 'DUPLICATE_PARENT_ASSIGNMENT') {
+          errorMessage = error.error.message;
+        } else if (error.error && error.error.message) {
+          errorMessage += error.error.message;
+        } else if (error.message) {
+          errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
+        this.isLoading = false;
       }
     });
   }
@@ -2212,18 +2324,48 @@ export class TeacherDashboardComponent implements OnInit {
       password: this.newParent.password,
       userEmail: this.newParent.userEmail,
       userContact: this.newParent.userContact,
-      occupation: this.newParent.occupation,
-      studentId: this.selectedStudent.id
+      occupation: this.newParent.occupation
     };
 
     // Call API to create parent
     this.apiService.createParent(parentData).subscribe({
       next: (response) => {
         console.log('Parent created:', response);
-        this.loadStudents(); // Reload the list
-        this.closeAssignParentModal();
-        this.isLoading = false;
-        alert('Parent created and assigned successfully!');
+        
+        // Assign the newly created parent to the student
+        if (response.parent && response.parent.userId) {
+          this.apiService.updateStudentParent(this.selectedStudent.id, response.parent.userId).subscribe({
+            next: (assignResponse) => {
+              console.log('Parent assigned:', assignResponse);
+              this.loadStudents(); // Reload the list
+              this.closeAssignParentModal();
+              this.isLoading = false;
+              alert(`Parent ${this.newParent.userName} created and assigned to ${this.selectedStudent.name} successfully!`);
+            },
+            error: (assignError) => {
+              console.error('Error assigning parent:', assignError);
+              let errorMessage = 'Parent created but failed to assign to student. ';
+              
+              if (assignError.error && assignError.error.error === 'DUPLICATE_PARENT_ASSIGNMENT') {
+                errorMessage = assignError.error.message;
+              } else if (assignError.error && assignError.error.message) {
+                errorMessage += assignError.error.message;
+              } else {
+                errorMessage += 'Please assign manually.';
+              }
+              
+              alert(errorMessage);
+              this.loadStudents();
+              this.closeAssignParentModal();
+              this.isLoading = false;
+            }
+          });
+        } else {
+          alert('Parent created but failed to assign to student. Please assign manually.');
+          this.loadStudents();
+          this.closeAssignParentModal();
+          this.isLoading = false;
+        }
       },
       error: (error) => {
         console.error('Error creating parent:', error);
@@ -2244,24 +2386,249 @@ export class TeacherDashboardComponent implements OnInit {
     });
   }
 
-  assignExistingParent(parent: any) {
-    if (!isPlatformBrowser(this.platformId) || !this.selectedStudent) {
+  // New Parent Management Methods
+  loadParents() {
+    this.isLoading = true;
+    this.apiService.getParents().subscribe({
+      next: (response) => {
+        console.log('Parents loaded:', response);
+        this.parentsList = response.data || response || [];
+        this.filterParents();
+        this.extractParentOccupations();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading parents:', error);
+        this.parentsList = [];
+        this.filteredParentsList = [];
+        this.isLoading = false;
+      }
+    });
+  }
+
+  filterParents() {
+    let filtered = [...this.parentsList];
+
+    // Search filter
+    if (this.parentSearchTerm) {
+      const searchTerm = this.parentSearchTerm.toLowerCase();
+      filtered = filtered.filter(parent => 
+        parent.user?.userName?.toLowerCase().includes(searchTerm) ||
+        parent.user?.userEmail?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Occupation filter
+    if (this.parentOccupationFilter) {
+      filtered = filtered.filter(parent => 
+        parent.occupation === this.parentOccupationFilter
+      );
+    }
+
+    // Status filter
+    if (this.parentStatusFilter) {
+      if (this.parentStatusFilter === 'assigned') {
+        filtered = filtered.filter(parent => 
+          parent.students && parent.students.length > 0
+        );
+      } else if (this.parentStatusFilter === 'unassigned') {
+        filtered = filtered.filter(parent => 
+          !parent.students || parent.students.length === 0
+        );
+      }
+    }
+
+    this.filteredParentsList = filtered;
+  }
+
+  extractParentOccupations() {
+    const occupations = new Set<string>();
+    this.parentsList.forEach(parent => {
+      if (parent.occupation) {
+        occupations.add(parent.occupation);
+      }
+    });
+    this.parentOccupations = Array.from(occupations).sort();
+  }
+
+  clearParentFilters() {
+    this.parentSearchTerm = '';
+    this.parentOccupationFilter = '';
+    this.parentStatusFilter = '';
+    this.filterParents();
+  }
+
+  // Parent Modal Methods
+  openAssignParentModal(student: any) {
+    this.selectedStudent = student;
+    this.showAssignParentModal = true;
+    this.parentModalTab = 'create';
+    this.resetNewParentForm();
+    this.loadAvailableParents();
+  }
+
+  openAddParentModal() {
+    this.showAddParentModal = true;
+    this.resetNewParentForm();
+  }
+
+  closeAddParentModal() {
+    this.showAddParentModal = false;
+    this.resetNewParentForm();
+  }
+
+  openEditParentModal(parent: any) {
+    this.selectedParentForEdit = parent;
+    this.editParentForm = {
+      userName: parent.user?.userName || '',
+      userEmail: parent.user?.userEmail || '',
+      userContact: parent.user?.userContact || '',
+      occupation: parent.occupation || ''
+    };
+    this.showEditParentModal = true;
+  }
+
+  closeEditParentModal() {
+    this.showEditParentModal = false;
+    this.selectedParentForEdit = null;
+    this.resetEditParentForm();
+  }
+
+  openParentDetailsModal(parent: any) {
+    this.selectedParentDetails = parent;
+    this.showParentDetailsModal = true;
+  }
+
+  closeParentDetailsModal() {
+    this.showParentDetailsModal = false;
+    this.selectedParentDetails = null;
+  }
+
+  resetEditParentForm() {
+    this.editParentForm = {
+      userName: '',
+      userEmail: '',
+      userContact: '',
+      occupation: ''
+    };
+  }
+
+  // Parent CRUD Operations
+  addParent() {
+    if (!this.newParentForm.userName || !this.newParentForm.userEmail || !this.newParentForm.password) {
+      alert('Please fill in all required fields');
       return;
     }
 
     this.isLoading = true;
 
-    this.apiService.updateStudentParent(this.selectedStudent.id, parent.userId).subscribe({
+    const parentData = {
+      userName: this.newParentForm.userName,
+      userEmail: this.newParentForm.userEmail,
+      password: this.newParentForm.password,
+      userContact: this.newParentForm.userContact,
+      occupation: this.newParentForm.occupation
+    };
+
+    this.apiService.createParent(parentData).subscribe({
       next: (response) => {
-        console.log('Parent assigned:', response);
-        this.loadStudents(); // Reload the list
-        this.closeAssignParentModal();
+        console.log('Parent created:', response);
+        this.loadParents();
+        this.closeAddParentModal();
         this.isLoading = false;
-        alert('Parent assigned successfully!');
+        alert('Parent created successfully!');
       },
       error: (error) => {
-        console.error('Error assigning parent:', error);
-        alert('Failed to assign parent. Please try again.');
+        console.error('Error creating parent:', error);
+        let errorMessage = 'Failed to create parent. ';
+        
+        if (error.error && error.error.message) {
+          // Don't duplicate the message if it already contains "Failed to create parent"
+          if (error.error.message.includes('Failed to create parent')) {
+            errorMessage = error.error.message;
+          } else {
+            errorMessage += error.error.message;
+          }
+        } else if (error.error && error.error.errors) {
+          const errors = Object.values(error.error.errors).flat();
+          errorMessage += errors.join(', ');
+        } else if (error.message) {
+          errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  editParent(parent: any) {
+    this.openEditParentModal(parent);
+  }
+
+  updateParent() {
+    if (!this.editParentForm.userName || !this.editParentForm.userEmail) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    this.isLoading = true;
+
+    const updateData = {
+      userName: this.editParentForm.userName,
+      userEmail: this.editParentForm.userEmail,
+      userContact: this.editParentForm.userContact,
+      occupation: this.editParentForm.occupation
+    };
+
+    this.apiService.updateParent(this.selectedParentForEdit.parentId, updateData).subscribe({
+      next: (response) => {
+        console.log('Parent updated:', response);
+        this.loadParents();
+        this.closeEditParentModal();
+        this.isLoading = false;
+        alert('Parent updated successfully!');
+      },
+      error: (error) => {
+        console.error('Error updating parent:', error);
+        let errorMessage = 'Failed to update parent. ';
+        
+        if (error.error && error.error.message) {
+          errorMessage += error.error.message;
+        } else if (error.error && error.error.errors) {
+          const errors = Object.values(error.error.errors).flat();
+          errorMessage += errors.join(', ');
+        } else if (error.message) {
+          errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  viewParentDetails(parent: any) {
+    this.openParentDetailsModal(parent);
+  }
+
+  deleteParent(parent: any) {
+    if (!confirm(`Are you sure you want to delete parent "${parent.user?.userName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.apiService.deleteParent(parent.parentId).subscribe({
+      next: (response) => {
+        console.log('Parent deleted:', response);
+        this.loadParents();
+        this.isLoading = false;
+        alert('Parent deleted successfully!');
+      },
+      error: (error) => {
+        console.error('Error deleting parent:', error);
+        alert('Failed to delete parent. Please try again.');
         this.isLoading = false;
       }
     });

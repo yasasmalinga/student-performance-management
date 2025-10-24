@@ -66,24 +66,33 @@ class ReportController extends Controller
         $query = DB::table('students')
             ->join('users', 'students.userId', '=', 'users.userId')
             ->leftJoin('attendance', 'students.studentId', '=', 'attendance.studentId')
+            ->leftJoin('grades', 'students.gradeId', '=', 'grades.gradeId')
             ->select(
                 'students.studentId',
                 'students.studentNumber',
                 'users.userName',
-                DB::raw('COUNT(*) as totalDays'),
+                'students.gradeId',
+                'grades.gradeName',
+                DB::raw('COUNT(attendance.attendanceId) as totalDays'),
                 DB::raw('SUM(CASE WHEN attendance.status = "Present" THEN 1 ELSE 0 END) as presentDays'),
                 DB::raw('SUM(CASE WHEN attendance.status = "Absent" THEN 1 ELSE 0 END) as absentDays'),
                 DB::raw('SUM(CASE WHEN attendance.status = "Late" THEN 1 ELSE 0 END) as lateDays'),
-                DB::raw('ROUND((SUM(CASE WHEN attendance.status = "Present" THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) as attendancePercentage')
+                DB::raw('ROUND((SUM(CASE WHEN attendance.status = "Present" THEN 1 ELSE 0 END) / COUNT(attendance.attendanceId)) * 100, 2) as attendancePercentage')
             )
-            ->groupBy('students.studentId', 'students.studentNumber', 'users.userName');
+            ->groupBy('students.studentId', 'students.studentNumber', 'users.userName', 'students.gradeId', 'grades.gradeName');
 
+        // Apply date filters
         if ($request->has('date_from')) {
             $query->where('attendance.attendanceDate', '>=', $request->date_from);
         }
 
         if ($request->has('date_to')) {
             $query->where('attendance.attendanceDate', '<=', $request->date_to);
+        }
+
+        // Apply grade filter
+        if ($request->has('grade_id') && $request->grade_id) {
+            $query->where('students.gradeId', $request->grade_id);
         }
 
         $results = $query->get();

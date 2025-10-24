@@ -32,6 +32,10 @@
         <span class="nav-icon">📈</span>
         Grades & Marks
       </a>
+      <a (click)="setActiveView('parents')" [class.active]="isActive('parents')" class="nav-item">
+        <span class="nav-icon">👨‍👩‍👦</span>
+        Parents
+      </a>
       <a (click)="setActiveView('reports')" [class.active]="isActive('reports')" class="nav-item">
         <span class="nav-icon">📋</span>
         Reports
@@ -308,9 +312,18 @@
                 <span *ngIf="!student.section" class="text-muted">-</span>
               </td>
               <td>
-                <span *ngIf="student.parentName" class="parent-badge">
-                  👨‍👩‍👦 {{ student.parentName }}
-                </span>
+                <div *ngIf="student.parentName" class="parent-info">
+                  <div class="parent-name">👨‍👩‍👦 {{ student.parentName }}</div>
+                  <div *ngIf="student.parentOccupation" class="parent-occupation">{{ student.parentOccupation }}</div>
+                  <div class="parent-actions">
+                    <button class="action-btn change-parent-btn" (click)="openChangeParentModal(student)" title="Change Parent">
+                      🔄 Change
+                    </button>
+                    <button class="action-btn remove-parent-btn" (click)="removeParentFromStudent(student)" title="Remove Parent">
+                      ❌ Remove
+                    </button>
+                  </div>
+                </div>
                 <button *ngIf="!student.parentName" class="action-btn parent-btn" (click)="openAssignParentModal(student)" title="Assign Parent">
                   ➕ Parent
                 </button>
@@ -766,6 +779,120 @@
         <p class="empty-icon">📊</p>
         <p class="empty-message">No grade data available</p>
         <p>Add test results to see student grades here</p>
+      </div>
+    </div>
+
+    <!-- Parents View -->
+    <div *ngIf="activeView === 'parents'" class="content-view">
+      <div class="view-header">
+        <div>
+          <h2>Parent Management</h2>
+          <p>Manage parent accounts and their information</p>
+        </div>
+        <button class="btn-primary" (click)="openAddParentModal()">
+          <span class="btn-icon">➕</span>
+          Add New Parent
+        </button>
+      </div>
+
+      <!-- Parent Filters -->
+      <div class="filters-section">
+        <div class="filter-group">
+          <input 
+            type="text" 
+            [(ngModel)]="parentSearchTerm" 
+            (input)="filterParents()"
+            placeholder="Search parents by name or email..."
+            class="search-input">
+        </div>
+        <div class="filter-group">
+          <select [(ngModel)]="parentOccupationFilter" (change)="filterParents()" class="filter-select">
+            <option value="">All Occupations</option>
+            <option *ngFor="let occupation of parentOccupations" [value]="occupation">
+              {{ occupation }}
+            </option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select [(ngModel)]="parentStatusFilter" (change)="filterParents()" class="filter-select">
+            <option value="">All Parents</option>
+            <option value="assigned">With Students</option>
+            <option value="unassigned">Without Students</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Parents Table -->
+      <div class="table-container" *ngIf="filteredParentsList.length > 0">
+        <table class="parents-table">
+          <thead>
+            <tr>
+              <th>Parent Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Occupation</th>
+              <th>Students</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let parent of filteredParentsList" class="parent-row">
+              <td class="parent-name">
+                <div class="name-cell">
+                  <div class="parent-avatar">{{ parent.user?.userName?.charAt(0) || 'P' }}</div>
+                  <span>{{ parent.user?.userName || 'N/A' }}</span>
+                </div>
+              </td>
+              <td>{{ parent.user?.userEmail || 'N/A' }}</td>
+              <td>{{ parent.user?.userContact || 'N/A' }}</td>
+              <td>
+                <span *ngIf="parent.occupation" class="occupation-badge">{{ parent.occupation }}</span>
+                <span *ngIf="!parent.occupation" class="text-muted">Not specified</span>
+              </td>
+              <td>
+                <span *ngIf="parent.students && parent.students.length > 0" class="students-count">
+                  {{ parent.students.length }} student(s)
+                </span>
+                <span *ngIf="!parent.students || parent.students.length === 0" class="text-muted">
+                  No students
+                </span>
+              </td>
+              <td>
+                <span *ngIf="parent.students && parent.students.length > 0" class="status-badge active">
+                  Active
+                </span>
+                <span *ngIf="!parent.students || parent.students.length === 0" class="status-badge inactive">
+                  Inactive
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button class="action-btn view-btn" (click)="viewParentDetails(parent)" title="View Details">
+                  👁️
+                </button>
+                <button class="action-btn edit-btn" (click)="editParent(parent)" title="Edit Parent">
+                  ✏️
+                </button>
+                <button class="action-btn delete-btn" (click)="deleteParent(parent)" title="Delete Parent">
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredParentsList.length === 0" class="empty-state">
+        <p class="empty-icon">👨‍👩‍👦</p>
+        <p class="empty-message">No parents found</p>
+        <p *ngIf="parentSearchTerm || parentOccupationFilter || parentStatusFilter">
+          Try adjusting your search filters or 
+          <button class="link-btn" (click)="clearParentFilters()">clear all filters</button>
+        </p>
+        <p *ngIf="!parentSearchTerm && !parentOccupationFilter && !parentStatusFilter">
+          Start by adding your first parent account.
+        </p>
       </div>
     </div>
 
@@ -1333,6 +1460,10 @@
             <div class="detail-item">
               <span class="detail-label">Parent Contact:</span>
               <span class="detail-value">{{ studentDetails.parentContact }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Parent Occupation:</span>
+              <span class="detail-value">{{ studentDetails.parentOccupation }}</span>
             </div>
           </div>
         </div>
@@ -2079,4 +2210,196 @@
       </form>
     </div>
   </div>
+
+  <!-- Add Parent Modal -->
+  <div class="modal-overlay" *ngIf="showAddParentModal" (click)="closeAddParentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>👨‍👩‍👦 Add New Parent</h3>
+        <button class="modal-close" (click)="closeAddParentModal()">✕</button>
+      </div>
+
+      <form class="modal-form" (ngSubmit)="addParent()">
+        <div class="form-group">
+          <label for="newParentName">Parent Name *</label>
+          <input 
+            type="text" 
+            id="newParentName" 
+            [(ngModel)]="newParentForm.userName"
+            name="newParentName"
+            placeholder="Enter parent name"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="newParentEmail">Email *</label>
+          <input 
+            type="email" 
+            id="newParentEmail" 
+            [(ngModel)]="newParentForm.userEmail"
+            name="newParentEmail"
+            placeholder="Enter email address"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="newParentPassword">Password *</label>
+          <input 
+            type="password" 
+            id="newParentPassword" 
+            [(ngModel)]="newParentForm.password"
+            name="newParentPassword"
+            placeholder="Enter password"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="newParentContact">Contact Number</label>
+          <input 
+            type="tel" 
+            id="newParentContact" 
+            [(ngModel)]="newParentForm.userContact"
+            name="newParentContact"
+            placeholder="Enter contact number">
+        </div>
+
+        <div class="form-group">
+          <label for="newParentOccupation">Occupation</label>
+          <input 
+            type="text" 
+            id="newParentOccupation" 
+            [(ngModel)]="newParentForm.occupation"
+            name="newParentOccupation"
+            placeholder="Enter occupation">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeAddParentModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="isLoading">
+            <span *ngIf="!isLoading">➕ Add Parent</span>
+            <span *ngIf="isLoading">Adding...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Parent Modal -->
+  <div class="modal-overlay" *ngIf="showEditParentModal" (click)="closeEditParentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>✏️ Edit Parent</h3>
+        <button class="modal-close" (click)="closeEditParentModal()">✕</button>
+      </div>
+
+      <form class="modal-form" (ngSubmit)="updateParent()">
+        <div class="form-group">
+          <label for="editParentName">Parent Name *</label>
+          <input 
+            type="text" 
+            id="editParentName" 
+            [(ngModel)]="editParentForm.userName"
+            name="editParentName"
+            placeholder="Enter parent name"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="editParentEmail">Email *</label>
+          <input 
+            type="email" 
+            id="editParentEmail" 
+            [(ngModel)]="editParentForm.userEmail"
+            name="editParentEmail"
+            placeholder="Enter email address"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="editParentContact">Contact Number</label>
+          <input 
+            type="tel" 
+            id="editParentContact" 
+            [(ngModel)]="editParentForm.userContact"
+            name="editParentContact"
+            placeholder="Enter contact number">
+        </div>
+
+        <div class="form-group">
+          <label for="editParentOccupation">Occupation</label>
+          <input 
+            type="text" 
+            id="editParentOccupation" 
+            [(ngModel)]="editParentForm.occupation"
+            name="editParentOccupation"
+            placeholder="Enter occupation">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeEditParentModal()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="isLoading">
+            <span *ngIf="!isLoading">💾 Update Parent</span>
+            <span *ngIf="isLoading">Updating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Parent Details Modal -->
+  <div class="modal-overlay" *ngIf="showParentDetailsModal" (click)="closeParentDetailsModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>👨‍👩‍👦 Parent Details</h3>
+        <button class="modal-close" (click)="closeParentDetailsModal()">✕</button>
+      </div>
+
+      <div class="parent-details-content" *ngIf="selectedParentDetails">
+        <div class="parent-info-section">
+          <div class="parent-avatar-large">{{ selectedParentDetails.user?.userName?.charAt(0) || 'P' }}</div>
+          <div class="parent-basic-info">
+            <h2>{{ selectedParentDetails.user?.userName || 'N/A' }}</h2>
+            <p class="parent-email">{{ selectedParentDetails.user?.userEmail || 'N/A' }}</p>
+            <p class="parent-contact">{{ selectedParentDetails.user?.userContact || 'N/A' }}</p>
+            <span *ngIf="selectedParentDetails.occupation" class="occupation-badge-large">
+              {{ selectedParentDetails.occupation }}
+            </span>
+          </div>
+        </div>
+
+        <div class="parent-students-section" *ngIf="selectedParentDetails.students && selectedParentDetails.students.length > 0">
+          <h3>👨‍🎓 Associated Students</h3>
+          <div class="students-list">
+            <div *ngFor="let student of selectedParentDetails.students" class="student-item">
+              <div class="student-avatar">{{ student.user?.userName?.charAt(0) || 'S' }}</div>
+              <div class="student-info">
+                <h4>{{ student.user?.userName || 'N/A' }}</h4>
+                <p>{{ student.studentNumber || 'N/A' }}</p>
+                <span class="grade-badge">{{ student.grade || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="parent-students-section" *ngIf="!selectedParentDetails.students || selectedParentDetails.students.length === 0">
+          <h3>👨‍🎓 Associated Students</h3>
+          <p class="empty-message">No students assigned to this parent</p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeParentDetailsModal()">
+            Close
+          </button>
+          <button type="button" class="btn-primary" (click)="editParent(selectedParentDetails)">
+            ✏️ Edit Parent
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

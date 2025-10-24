@@ -57,6 +57,10 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/students/${id}/report`, { headers: this.getHeaders() });
   }
 
+  updateStudentParent(studentId: number, parentId: number | null): Observable<any> {
+    return this.http.put(`${this.apiUrl}/students/${studentId}/parent`, { parentId }, { headers: this.getHeaders() });
+  }
+
   // Users endpoints
   getUsers(): Observable<any> {
     return this.http.get(`${this.apiUrl}/users`, { headers: this.getHeaders() });
@@ -121,8 +125,12 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/attendance/by-date/${date}`, { headers: this.getHeaders() });
   }
 
-  getAttendanceReport(dateFrom: string, dateTo: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/reports/attendance?date_from=${dateFrom}&date_to=${dateTo}`, { headers: this.getHeaders() });
+  getAttendanceReport(dateFrom: string, dateTo: string, gradeId?: number): Observable<any> {
+    let url = `${this.apiUrl}/reports/attendance?date_from=${dateFrom}&date_to=${dateTo}`;
+    if (gradeId) {
+      url += `&grade_id=${gradeId}`;
+    }
+    return this.http.get(url, { headers: this.getHeaders() });
   }
 
   // Parents endpoints
@@ -146,16 +154,16 @@ export class ApiService {
     return this.http.put(`${this.apiUrl}/parents/${parentId}`, parentData, { headers: this.getHeaders() });
   }
 
+  deleteParent(parentId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/parents/${parentId}`, { headers: this.getHeaders() });
+  }
+
   assignStudentToParent(parentId: number, studentId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/parents/${parentId}/assign-student`, { studentId }, { headers: this.getHeaders() });
   }
 
   getStudentsWithoutParents(): Observable<any> {
     return this.http.get(`${this.apiUrl}/students/without-parents`, { headers: this.getHeaders() });
-  }
-
-  updateStudentParent(studentId: number, parentId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/students/${studentId}/parent`, { parentId }, { headers: this.getHeaders() });
   }
 
   // Additional student-specific endpoints
