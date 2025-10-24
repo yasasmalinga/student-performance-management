@@ -15,7 +15,6 @@ class ParentModel extends Model
 
     protected $fillable = [
         'userId',
-        'studentId',
         'occupation',
     ];
 
@@ -25,9 +24,16 @@ class ParentModel extends Model
         return $this->belongsTo(User::class, 'userId', 'userId');
     }
 
-    public function student()
+    // One parent can have multiple children
+    public function students()
     {
-        return $this->belongsTo(Student::class, 'studentId', 'studentId');
+        return $this->hasMany(Student::class, 'parentId', 'userId');
+    }
+
+    // Helper method to get all children
+    public function children()
+    {
+        return $this->students();
     }
 }
 
